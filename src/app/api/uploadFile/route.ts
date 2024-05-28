@@ -1,33 +1,30 @@
-import { convertBase64ToFile } from "../../../utils/fileUtils";
-import { getSignedUrl, uploadFile } from "../../../utils/gcloudUtils";
-import { NextRequest, NextResponse } from "next/server";
+import { initTRPC } from "@trpc/server";
+import { z } from "zod";
+import { convertBase64ToFile } from "~/utils/fileUtils";
+import { getSignedUrl, uploadFile } from "~/utils/gcloudUtils";
 
-export async function POST(req: NextRequest) {
-  try {
-    const { base64 } = await req.json();
+const t = initTRPC.context().create();
 
-    if (!base64) {
-      return NextResponse.json(
-        { error: "No file data provided" },
-        { status: 400 },
-      );
-    }
+export const appRouter = t.router({
+  uploadFile: t.procedure
+    .input(z.object({ base64: z.string() })) // Input validation
+    .mutation(async ({ input }) => {
+      try {
+        const { buffer, fileName, contentType } = await convertBase64ToFile(
+          input.base64,
+        );
 
-    const { buffer, fileName, contentType } = await convertBase64ToFile(base64);
+        await uploadFile(buffer, fileName, contentType);
+        const signedUrl = await getSignedUrl(fileName, 3600); // URL valid for 1 hour
 
-    await uploadFile(buffer, fileName, contentType);
-    const signedUrl = await getSignedUrl(fileName, 3600); // URL valid for 1 hour
-
-    return NextResponse.json({
-      size: buffer.length,
-      mimeType: contentType,
-      signedUrl,
-    });
-  } catch (error) {
-    console.error("Error uploading file:", error);
-    return NextResponse.json(
-      { error: "Failed to upload the file" },
-      { status: 500 },
-    );
-  }
-}
+        return {
+          size: buffer.length,
+          mimeType: contentType,
+          signedUrl,
+        };
+      } catch (error) {
+        console.error("Error uploading file:", error);
+        throw new Error("Failed to upload the file");
+      }
+    }),
+});

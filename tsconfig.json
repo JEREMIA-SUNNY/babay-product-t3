@@ -35,7 +35,8 @@
     "**/*.tsx",
     "**/*.cjs",
     "**/*.js",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "src/app/api/uploadFile/route.tsss"
   ],
   "exclude": ["node_modules"]
 }
