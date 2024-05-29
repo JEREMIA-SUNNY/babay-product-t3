@@ -7,7 +7,6 @@ import {
 } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { useRouter } from "next/navigation";
-
 import axios from "axios";
 import { api } from "~/trpc/react";
 export default function Home() {
@@ -21,6 +20,7 @@ export default function Home() {
       },
       onError: (error) => {
         alert(error.message);
+       
       },
     });
 
@@ -260,10 +260,16 @@ export default function Home() {
       alert("No file baby");
       return;
     }
+    const authTokenReq = process.env.NEXT_PUBLIC_AUTH_TOKEN_REQ;
+
+    if (!authTokenReq) {
+      throw new Error("Missing Token");
+    }
 
     const base64 = await convertFileToBase64(file);
     void uploadDocument({
       base64,
+      token: authTokenReq,
     });
   };
 
@@ -280,8 +286,13 @@ export default function Home() {
 
   const handleExtraction = () => {
     if (fileKey) {
+      const authTokenReq = process.env.NEXT_PUBLIC_AUTH_TOKEN_REQ;
+      if (!authTokenReq) {
+        throw new Error("Missing Token");
+      }
       extractText({
         fileKey,
+        token: authTokenReq,
       });
     }
   };
@@ -302,7 +313,7 @@ export default function Home() {
       if (!file) throw new Error("No file selected");
       const base64 = await convertFileToBase64(file);
       const response = await axios.post("/api/uploadFile", { base64 });
-      console.log(response.data);
+     
     } catch (error) {
       console.error("Error uploading file:", error);
     }
@@ -637,7 +648,7 @@ export default function Home() {
                             ]);
                           }}
                         />
-                        <div className="flex justify-center">
+                        <div className="flex justify-center gap-4">
                           {" "}
                           <button
                             id="button"
@@ -704,7 +715,7 @@ export default function Home() {
                                           <svg
                                             className="ml-auto h-4 w-4 fill-current pt-1"
                                             xmlns="http://www.w3.org/2000/svg"
-                                            width="24"
+                                            width=""
                                             height="24"
                                             viewBox="0 0 24 24"
                                           >
@@ -712,7 +723,7 @@ export default function Home() {
                                           </svg>
                                         </i>
                                       </span>
-                                      <p className="size p-1 text-sm text-gray-700">
+                                      <p className="size p-1 text-xs text-gray-700">
                                         {file.size > 1024
                                           ? file.size > 1048576
                                             ? `${Math.round(
@@ -803,7 +814,7 @@ export default function Home() {
             </div>
           )}
           <div className="s flex  flex-1 items-center justify-center rounded-xl bg-white text-center text-sm font-semibold text-black ">
-            {!extractedText && fileKey && (
+            {!extractedText && fileKey ? (
               <button
                 onClick={handleExtraction}
                 disabled={isExtractingText || isDocumentUploading || !fileKey}
@@ -811,8 +822,16 @@ export default function Home() {
               >
                 {isExtractingText ? "Loading..." : "Extract"}
               </button>
+            ) : extractedText ? (
+              ""
+            ) : (
+              "Analysis/Recommendations"
             )}
-            {extractedText && <p className="p-2 text-left">{extractedText}</p>}
+            {extractedText && (
+              <p className="max-h-[600px]  overflow-y-scroll p-5  text-justify font-normal ">
+                {extractedText}
+              </p>
+            )}
           </div>
         </section>
       </main>
