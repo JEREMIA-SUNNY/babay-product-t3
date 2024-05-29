@@ -7,7 +7,7 @@ export const env = createEnv({
    * isn't built with invalid env vars.
    */
   server: {
-    NODE_ENV: z.enum(["development", "test", "production"]),
+    APP_ENV: z.enum(["development", "test", "production"]),
     GOOGLE_API_KEY: z.string(),
     BUCKET_NAME: z.string(),
     AUTH_TOKEN_REQ: z.string(),
@@ -19,7 +19,6 @@ export const env = createEnv({
    * `NEXT_PUBLIC_`.
    */
   client: {
-    // NEXT_PUBLIC_CLIENTVAR: z.string(),
     NEXT_PUBLIC_AUTH_TOKEN_REQ: z.string(),
   },
 
@@ -28,11 +27,10 @@ export const env = createEnv({
    * middlewares) or client-side so we need to destruct manually.
    */
   runtimeEnv: {
-    NODE_ENV: process.env.NODE_ENV,
+    APP_ENV: process.env.APP_ENV,
     GOOGLE_API_KEY: process.env.GOOGLE_API_KEY,
     BUCKET_NAME: process.env.BUCKET_NAME,
     AUTH_TOKEN_REQ: process.env.AUTH_TOKEN_REQ,
-    // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
     NEXT_PUBLIC_AUTH_TOKEN_REQ: process.env.NEXT_PUBLIC_AUTH_TOKEN_REQ,
   },
   /**
