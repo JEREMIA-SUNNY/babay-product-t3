@@ -1,4 +1,6 @@
 import { Storage } from "@google-cloud/storage";
+import vision from "@google-cloud/vision";
+import { env } from "~/env";
 
 type GoogleApiKey = {
   type: string;
@@ -14,12 +16,12 @@ type GoogleApiKey = {
   universe_domain: string;
 };
 
-const bucketName = process.env.BUCKET_NAME ?? "";
+const bucketName = env.BUCKET_NAME;
 
 let googleApiKey: GoogleApiKey | null = null;
 
 try {
-  googleApiKey = JSON.parse(process.env.GOOGLE_API_KEY ?? "");
+  googleApiKey = JSON.parse(env.GOOGLE_API_KEY);
 } catch (error) {
   console.error("Error parsing GOOGLE_API_KEY:", error);
 }
@@ -28,12 +30,8 @@ if (!googleApiKey) {
   throw new Error("Invalid GOOGLE_API_KEY in environment variables");
 }
 
-console.log(googleApiKey);
-
 const config = {
-  credentials: {
-    ...googleApiKey,
-  },
+  credentials: googleApiKey,
 };
 
 const storage = new Storage(config);
@@ -85,4 +83,68 @@ export async function getSignedUrl(
     console.error("Error generating signed URL:", error);
     throw error;
   }
+}
+
+export async function downloadFileWithPrefix(prefix: string) {
+  const bucket = storage.bucket(bucketName);
+  const [files] = await bucket.getFiles({
+    prefix,
+  });
+
+  let fullDocumentData = "";
+
+  for (const file of files) {
+    const [data] = await file.download();
+    const responseObject = JSON.parse(data.toString()) as {
+      responses: { fullTextAnnotation?: { text: string } }[];
+    };
+
+    let combinedText = "";
+
+    for (const response of responseObject.responses) {
+      if (response.fullTextAnnotation) {
+        combinedText += response.fullTextAnnotation.text;
+      }
+    }
+
+    fullDocumentData += combinedText + "\n";
+  }
+
+  return fullDocumentData;
+}
+
+export async function extractPdfDocument(
+  fileName: string,
+  extractFileName: string,
+) {
+  const client = new vision.ImageAnnotatorClient(config);
+
+  const gcsSourceUri = `gs://${bucketName}/${fileName}`;
+  const gcsDestinationUri = `gs://${bucketName}/${extractFileName}`;
+
+  // Extract the data
+  const [operation] = await client.asyncBatchAnnotateFiles({
+    requests: [
+      {
+        inputConfig: {
+          mimeType: "application/pdf",
+          gcsSource: {
+            uri: gcsSourceUri,
+          },
+        },
+        outputConfig: {
+          gcsDestination: {
+            uri: gcsDestinationUri,
+          },
+        },
+        features: [
+          {
+            type: "DOCUMENT_TEXT_DETECTION",
+          },
+        ],
+      },
+    ],
+  });
+
+  await operation.promise();
 }

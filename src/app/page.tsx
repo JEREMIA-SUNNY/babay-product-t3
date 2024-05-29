@@ -9,7 +9,31 @@ import "react-circular-progressbar/dist/styles.css";
 import { useRouter } from "next/navigation";
 
 import axios from "axios";
+import { api } from "~/trpc/react";
 export default function Home() {
+  const [fileKey, setFileKey] = useState<string | null>(null);
+  const [extractedText, setExtractedText] = useState<string | null>(null);
+
+  const { mutate: uploadDocument, isPending: isDocumentUploading } =
+    api.document.uploadDocument.useMutation({
+      onSuccess: (data) => {
+        setFileKey(data.fileName);
+      },
+      onError: (error) => {
+        alert(error.message);
+      },
+    });
+
+  const { mutate: extractText, isPending: isExtractingText } =
+    api.document.extractDocument.useMutation({
+      onSuccess: (data) => {
+        setExtractedText(data);
+      },
+      onError: (error) => {
+        alert(error.message);
+      },
+    });
+
   const router = useRouter();
   const contractTypeList = [
     { name: "Supply Agreements" },
@@ -231,23 +255,16 @@ export default function Home() {
       alert("No files selected");
       return;
     }
-
-    const formData = new FormData();
-    formData.append("file", files[0] ?? ""); // Append only the first file
-
-    console.log(files[0], formData);
-
-    try {
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: files[0],
-      });
-
-      const result = await response.json();
-      alert(`Response: ${JSON.stringify(result)}`);
-    } catch (error) {
-      console.error("Error uploading file", error);
+    const file = files[0];
+    if (!file) {
+      alert("No file baby");
+      return;
     }
+
+    const base64 = await convertFileToBase64(file);
+    void uploadDocument({
+      base64,
+    });
   };
 
   const handleCancel = () => {
@@ -259,6 +276,14 @@ export default function Home() {
     localStorage.setItem("isLoggedIn", "false");
 
     router.push("/login");
+  };
+
+  const handleExtraction = () => {
+    if (fileKey) {
+      extractText({
+        fileKey,
+      });
+    }
   };
 
   const truncateFileName = (fileName: String, maxLength = 8) => {
@@ -625,8 +650,9 @@ export default function Home() {
                             id="button"
                             className="focus:shadow-outline  mt-2 rounded-md  border-2 border-black bg-black px-3 py-2 text-sm text-white transition-all duration-700 ease-linear hover:scale-105 focus:outline-none"
                             onClick={() => handleSubmit()}
+                            disabled={isDocumentUploading}
                           >
-                            submit
+                            {isDocumentUploading ? "Loading..." : "Submit"}
                           </button>
                         </div>
 
@@ -777,13 +803,16 @@ export default function Home() {
             </div>
           )}
           <div className="s flex  flex-1 items-center justify-center rounded-xl bg-white text-center text-sm font-semibold text-black ">
-            <button
-              className="focus:shadow-outline mt-2 rounded-md border-2 border-black bg-black px-3 py-2 text-sm text-white transition-all duration-700 ease-linear hover:scale-105 focus:outline-none"
-              onClick={handleUpload}
-            >
-              Upload File
-            </button>
-            <p>Analysis/Recommendations</p>
+            {!extractedText && fileKey && (
+              <button
+                onClick={handleExtraction}
+                disabled={isExtractingText || isDocumentUploading || !fileKey}
+                className="focus:shadow-outline  mt-2 rounded-md  border-2 border-black bg-black px-3 py-2 text-sm text-white transition-all duration-700 ease-linear hover:scale-105 focus:outline-none"
+              >
+                {isExtractingText ? "Loading..." : "Extract"}
+              </button>
+            )}
+            {extractedText && <p className="p-2 text-left">{extractedText}</p>}
           </div>
         </section>
       </main>
