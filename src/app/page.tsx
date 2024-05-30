@@ -631,7 +631,7 @@ export default function Home() {
               <div>
                 {" "}
                 <div className=" h- w- sm:px-2  sm:py-2">
-                  <main className="container relative mx-auto  h-full border">
+                  <main className="container relative mx-auto  h-full ">
                     {/* <div className="absolute inset-0 z-[2000] flex  items-center justify-center border">
                       {" "}
                       <div>
