@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { convertFileToBase64 } from "~/utils/fileUtils";
 import {
   buildStyles,
@@ -9,8 +9,11 @@ import "react-circular-progressbar/dist/styles.css";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { api } from "~/trpc/react";
-import ThreeDotsWave from "./ThreeDotWave";
 import ThreeDotsWaveMain from "./ThreeDotWaveMain";
+type FileArray = File[];
+interface FilePreviewProps {
+  files: File[];
+}
 export default function Home() {
   const [fileKey, setFileKey] = useState<string | null>(null);
   const [extractedText, setExtractedText] = useState<string | null>(null);
@@ -260,14 +263,14 @@ export default function Home() {
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (files: FileArray) => {
     if (files.length === 0) {
       alert("No files selected");
       return;
     }
     const file = files[0];
     if (!file) {
-      alert("No file baby");
+      alert("No file selected");
       return;
     }
     const authTokenReq = process.env.NEXT_PUBLIC_AUTH_TOKEN_REQ;
@@ -277,10 +280,11 @@ export default function Home() {
     }
 
     const base64 = await convertFileToBase64(file);
-    void uploadDocument({
+    await uploadDocument({
       base64,
       token: authTokenReq,
     });
+    setIsUploading(false);
   };
 
   const handleCancel = () => {
@@ -306,6 +310,14 @@ export default function Home() {
       });
     }
   };
+
+  const filePreviews = useMemo(() => {
+    return files.map((file) => ({
+      name: file.name,
+      type: file.type,
+      url: URL.createObjectURL(file),
+    }));
+  }, [files]);
 
   const truncateFileName = (fileName: String, maxLength = 32) => {
     if (fileName.length <= maxLength) {
@@ -371,7 +383,7 @@ export default function Home() {
 
             <div className=" flex  w-full   justify-center rounded-xl  bg-white px-2">
               <div className=" flex flex-col justify-center  bg-white  ">
-                <div className="flex items-center justify-center px-2 pb-6">
+                <div className="flex items-center justify-center px-5 pb-6">
                   <div className=" dropdown relative z-[10000] inline-block text-left">
                     <span className="rounded-md shadow-sm">
                       <button
@@ -624,9 +636,9 @@ export default function Home() {
             </div>
           </div>
         </section>
-        <section className="flex w-full     gap-4 px-8 pt-4">
-          <div className="flex  w-[25%] flex-col gap-3 rounded-2xl ">
-            <div className=" rounded-2xl bg-white">
+        <section className="flex max-h-[550px] w-full    gap-4 px-8 pt-4">
+          <div className="flex   w-[25%]  flex-col gap-3 rounded-2xl ">
+            <div className=" h-[250px] max-h-[250px] flex-1 rounded-2xl  bg-white">
               {" "}
               <div>
                 {" "}
@@ -643,10 +655,6 @@ export default function Home() {
                     <article
                       aria-label="File Upload Modal"
                       className="bg-w relative flex h-full flex-col  rounded-md"
-                      onDrop={handleDrop}
-                      onDragOver={handleDragOver}
-                      onDragLeave={handleDragLeave}
-                      onDragEnter={handleDragOver}
                     >
                       <section className="flex   h-full  w-full flex-col">
                         <input
@@ -656,13 +664,21 @@ export default function Home() {
                           className="hidden"
                           ref={hiddenInputRef}
                           onChange={(e) => {
+                            setIsUploading(true);
                             const newFiles = e.target.files
                               ? Array.from(e.target.files)
                               : [];
-                            setFiles((prevFiles) => [
-                              ...prevFiles,
-                              ...newFiles,
-                            ]);
+                            if (newFiles.length === 0) {
+                              alert("No files selected");
+                              return;
+                            }
+
+                            setFiles((prevFiles) => {
+                              const updatedFiles = [...prevFiles, ...newFiles];
+                              handleSubmit(updatedFiles); // Call handleSubmit with updated files
+                              return updatedFiles;
+                            });
+
                             if (hiddenInputRef.current) {
                               hiddenInputRef.current.value = "";
                             }
@@ -670,54 +686,14 @@ export default function Home() {
                         />
                         <div className="flex justify-center gap-4">
                           {" "}
-                          {files.length <= 0 && (
-                            <button
-                              id="button"
-                              className={`${files.length > 0 ? "pointer-events-none brightness-50" : "pointer-events-auto"} focus:shadow-outline disabled:   mt-2 min-w-[130px]  rounded-md border-2 border-black bg-black px-3 py-2 text-sm text-white transition-all duration-300 ease-linear hover:scale-105 focus:outline-none `}
-                              onClick={() => hiddenInputRef.current?.click()}
-                              disabled={!files || isUploading}
-                            >
-                              Select File
-                            </button>
-                          )}
-                          {files.length > 0 && (
-                            <button
-                              id="button"
-                              className={`${fileKey && !isDocumentUploading ? "pointer-events-none opacity-10" : "pointer-events-auto"} focus:shadow-outline mt-2 min-w-[130px] rounded-md  border-2 border-black bg-black px-3 py-2 text-sm text-white transition-all duration-700 ease-linear hover:scale-105 focus:outline-none`}
-                              onClick={() => handleSubmit()}
-                              disabled={isDocumentUploading}
-                            >
-                              {isDocumentUploading ? (
-                                <p className="flex">
-                                  <span className="flex">
-                                    <svg
-                                      aria-hidden="true"
-                                      role="status"
-                                      className="mr-3 inline h-6 w-6 animate-spin text-white"
-                                      viewBox="0 0 100 101"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <path
-                                        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                                        fill="#E5E7EB"
-                                      ></path>
-                                      <path
-                                        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                                        fill="currentColor"
-                                      ></path>
-                                    </svg>
-                                    <span className="animate-pulse">
-                                      {" "}
-                                      Loading...
-                                    </span>
-                                  </span>
-                                </p>
-                              ) : (
-                                "Upload File"
-                              )}
-                            </button>
-                          )}
+                          <button
+                            id="button"
+                            className={`${files.length > 0 ? "pointer-events-none brightness-50" : "pointer-events-auto"} focus:shadow-outline disabled:   mt-2 min-w-[130px]  rounded-md border-2 border-black bg-black px-3 py-2 text-sm text-white transition-all duration-300 ease-linear hover:scale-105 focus:outline-none `}
+                            onClick={() => hiddenInputRef.current?.click()}
+                            disabled={!files || isUploading}
+                          >
+                            Select File
+                          </button>
                         </div>
 
                         <ul
@@ -763,30 +739,6 @@ export default function Home() {
                                       {truncateFileName(file.name)}
                                     </h1>
                                     <div className="flex justify-end">
-                                      {/* <span className="p-1 text-black">
-                                        <i>
-                                          <svg
-                                            className="ml-auto h-4 w-4 fill-current pt-1"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            width=""
-                                            height="24"
-                                            viewBox="0 0 24 24"
-                                          >
-                                            <path d="M15 2v5h5v15h-16v-20h11zm1-2h-14v24h20v-18l-6-6z" />
-                                          </svg>
-                                        </i>
-                                      </span>
-                                      <p className="size p-1 text-xs text-gray-700">
-                                        {file.size > 1024
-                                          ? file.size > 1048576
-                                            ? `${Math.round(
-                                                file.size / 1048576,
-                                              )}mb`
-                                            : `${Math.round(
-                                                file.size / 1024,
-                                              )}kb`
-                                          : `${file.size}b`}
-                                      </p> */}
                                       <button
                                         className="delete  rounded-md px-2  text-black hover:bg-gray-300 focus:outline-none"
                                         onClick={() => handleDelete(file)}
@@ -817,8 +769,8 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div className="rounded-2xl  bg-white py-4  ">
-              <p className="pb-4 text-center text-sm font-semibold text-black ">
+            <div className="  h-[260px] rounded-2xl   bg-white   ">
+              <p className="mt-4 pb-4 text-center text-sm font-semibold text-black ">
                 Compliance Score
               </p>
               <div className="md:px-32">
@@ -839,53 +791,69 @@ export default function Home() {
             </div>
           </div>{" "}
           {files.length !== 0 ? (
-            <div className=" h- bg w-full flex-1 overflow-x-auto  rounded-xl bg-white p-1 text-center">
-              {files.map((file) => (
-                <li key={file.name} className="flex h-full">
-                  <article
-                    tabIndex={0}
-                    className="focus:shadow-outline group relative h-full w-full cursor-pointer rounded-md  shadow-sm focus:outline-none"
-                  >
-                    {file.type === "application/pdf" ? (
-                      <iframe
-                        title="pdf preview"
-                        className="h-full w-full rounded-xl bg-red-400 text-center"
-                        src={`${URL.createObjectURL(file)}#toolbar=0`}
-                      />
-                    ) : (
-                      <div className="flex h-full items-center  justify-center bg-white">
-                        <p className="font-semibold text-black ">
-                          Document Preview
-                        </p>
-                      </div>
-                    )}
-                  </article>
-                </li>
-              ))}
+            <div className="h-full w-full flex-1 overflow-x-auto rounded-xl bg-white  p-1 text-center">
+              {files.length !== 0 && (
+                <ul>
+                  {filePreviews.map((file) => (
+                    <li key={file.name} className="flex h-full">
+                      <article
+                        tabIndex={0}
+                        className="focus:shadow-outline group relative h-full w-full cursor-pointer rounded-md shadow-sm focus:outline-none"
+                      >
+                        {file.type === "application/pdf" ? (
+                          <iframe
+                            className="max-h-[520px] min-h-[519px]  w-full rounded-xl bg-red-400 text-center"
+                            src={`${file.url}#toolbar=0`}
+                            title={file.name}
+                          />
+                        ) : (
+                          <div className="flex h-full items-center justify-center bg-white">
+                            <p className="font-semibold text-black">
+                              Document Preview
+                            </p>
+                          </div>
+                        )}
+                      </article>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           ) : (
             <div className=" l h- bg flex w-full flex-1 items-center justify-center rounded-xl bg-white p-1 text-center text-sm font-semibold text-black">
               <p>Document Preview</p>
             </div>
           )}
-          <div className="s flex  flex-1 items-center justify-center rounded-xl bg-white text-center text-sm font-semibold text-black ">
-            {!extractedText && fileKey ? (
-              isExtractingText && fileKey ? (
-                <ThreeDotsWaveMain />
+          <div
+            className={`r flex h-[530px] flex-1 items-center justify-center rounded-xl bg-white  p-2 text-justify text-xs text-black ${
+              extractedText
+                ? extractedText.length > 200
+                  ? "overflow-hidden"
+                  : ""
+                : ""
+            }`}
+          >
+            <div className="m flex h-full w-full items-center justify-center">
+              {!extractedText && fileKey ? (
+                isExtractingText ||
+                fileKey ||
+                isDocumentUploading ||
+                isUploading ||
+                files.length > 0 ? (
+                  <ThreeDotsWaveMain />
+                ) : (
+                  "Analysis/Recommendations"
+                )
+              ) : extractedText ? (
+                <div
+                  className={`p-5 ${extractedText.length > 200 ? "h-full overflow-y-scroll" : ""}`}
+                >
+                  {extractedText}
+                </div>
               ) : (
-                "Analysis/Recommendations"
-              )
-            ) : extractedText ? (
-              <p
-                className={`max-h-[530px] p-5 text-justify font-normal ${
-                  extractedText.length > 200 ? "overflow-y-scroll" : ""
-                }`}
-              >
-                {extractedText}
-              </p>
-            ) : (
-              "Analysis/Recommendations"
-            )}
+                <p className="font-semibold">Analysis/Recommendations</p>
+              )}
+            </div>
           </div>
         </section>
       </main>

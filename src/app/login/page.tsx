@@ -40,14 +40,14 @@ function page() {
           animate={{ y: 0, opacity: 1, scale: 1 }}
           exit={{ y: 100, opacity: 0, scale: 0.1 }}
           transition={{ duration: 1, ease: "easeInOut" }}
-          className="fixed text-black bottom-0 flex items-center justify-center  left-[42%] w-[300px] h-[50px] rounded-2xl bg-white"
+          className="fixed bottom-0 left-[42%] flex h-[50px] w-[300px]  items-center justify-center rounded-2xl bg-white text-black"
         >
           <p className="text-red-700">Invalid Credentials</p>
         </motion.div>
       )}
 
       {loggingin && (
-        <div className="fixed h-full flex justify-center w-full items-end ">
+        <div className="fixed flex h-full w-full items-end justify-center ">
           <ThreeDotsWave />
         </div>
       )}
@@ -61,22 +61,22 @@ function page() {
           backgroundRepeat: "none",
         }}
       >
-        <div className="rounded-xl bg-white  px-16 py-24  md:mr-36  shadow-lg  max-sm:px-8">
+        <div className="rounded-xl bg-white  px-16 py-24  shadow-lg  max-sm:px-8  md:mr-36">
           <div className="text-black">
             <div className="mb-8 flex flex-col items-center">
               <img
                 src="/logo.png"
                 width="200"
-                className="rounded-lg h- object-contain"
+                className="h- rounded-lg object-contain"
                 alt=""
               />
 
-              <span className="text-black mt-6">Enter Login Details</span>
+              <span className="mt-6 text-black">Enter Login Details</span>
             </div>
             <form onSubmit={handleLogin}>
-              <div className="mb-4 text-lg">
+              <div className="mb-4 text-base">
                 <input
-                  className="rounded-md border-none e  px-6 py-2 text-center text-inherit placeholder-black bg-[#d9d9d9]  "
+                  className="e placeholder:text- w-full rounded-md  border-none bg-[#d9d9d9] px-6 py-2 text-center text-inherit placeholder-black  "
                   type="text"
                   name="email"
                   placeholder="id@email.com"
@@ -84,9 +84,9 @@ function page() {
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
-              <div className="mb-4 text-lg">
+              <div className="mb-4 text-base">
                 <input
-                  className="rounded-md border-none e  px-6 py-2 text-center text-inherit placeholder-black bg-[#d9d9d9]  outline-none "
+                  className="e rounded-md border-none  bg-[#d9d9d9] px-6 py-2 text-center text-inherit placeholder-black  outline-none "
                   type="password"
                   name="password"
                   placeholder="*********"
@@ -97,7 +97,7 @@ function page() {
               <div className="mt-8 flex justify-center text-lg text-black">
                 <button
                   type="submit"
-                  className="rounded-md   text-white px-10 py-2 t bg-black backdrop-blur-md transition-colors duration-300 h"
+                  className="t   h rounded-md bg-black px-10 py-2 text-white backdrop-blur-md transition-colors duration-300"
                 >
                   Login
                 </button>
