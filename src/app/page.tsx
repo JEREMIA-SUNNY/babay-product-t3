@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { convertFileToBase64 } from "~/utils/fileUtils";
 import {
   buildStyles,
@@ -120,16 +120,16 @@ export default function Home() {
   const [selectedTemplateType, setSelectedTemplateType] = useState(
     templateType[0],
   );
+  const [checklistTypeIndex, setChecklistTypeIndex] = useState<number>(0);
 
   const handleContractTypeChange = (index: number) => {
+    
     setSelectedContractTypeName(contractTypeList[index]?.name ?? "");
-
+    setChecklistTypeIndex(index);
+    
     setSelectedTemplateType(templateType[index]);
   };
-
-  const handleTemplateTypChange = (index: string) => {
-    setSelectedContractTemplateName(index);
-  };
+  console.log(checklistTypeIndex);
 
   const ChecklistType = [
     { name: "Supply Agreements" },
@@ -202,9 +202,21 @@ export default function Home() {
     setSelectedChecklistTemplateTypeName,
   ] = useState("Select Checklist Template");
 
+  const handleTemplateTypChange = (index: string) => {
+    setSelectedContractTemplateName(index);
+  };
+
   const [selectedChecklistType, setSelectedChecklistType] = useState(
     ChecklistTemplate[0],
   );
+
+  useEffect(() => {
+    if (checklistTypeIndex) {
+      setSelectedChecklistTypeName(
+        ChecklistType[checklistTypeIndex]?.name ?? "",
+      );
+    }
+  }, [checklistTypeIndex]);
 
   const [selectedGeograhyName, setSelectedGeograhyName] =
     useState("Select Geography");
@@ -213,9 +225,11 @@ export default function Home() {
   };
 
   const handleChecklistTypeChange = (index: number) => {
-    if (ChecklistType[index]) {
-      setSelectedChecklistTypeName(ChecklistType[index]?.name ?? "");
-      const selectedTemplates = ChecklistTemplate[index] ?? [];
+    if (ChecklistType[checklistTypeIndex]) {
+      setSelectedChecklistTypeName(
+        ChecklistType[checklistTypeIndex]?.name ?? "",
+      );
+      const selectedTemplates = ChecklistTemplate[checklistTypeIndex] ?? [];
       setSelectedChecklistType(selectedTemplates);
       if (selectedTemplates.length > 0) {
         setSelectedChecklistTemplateTypeName(selectedTemplates[0]?.name ?? "");
