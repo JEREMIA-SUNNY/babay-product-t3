@@ -112,21 +112,20 @@ export default function Home() {
     ],
   ];
 
-  const [selectedContractTypeName, setSelectedContractTypeName] = useState(
-    "Select Contract Type",
-  );
+  const [selectedContractTypeName, setSelectedContractTypeName] = useState<
+    string | null
+  >(null);
   const [selectedContractTemplateName, setSelectedContractTemplateName] =
-    useState("Select Contract Template");
+    useState<string | null>(null);
   const [selectedTemplateType, setSelectedTemplateType] = useState(
     templateType[0],
   );
   const [checklistTypeIndex, setChecklistTypeIndex] = useState<number>(0);
 
   const handleContractTypeChange = (index: number) => {
-    
     setSelectedContractTypeName(contractTypeList[index]?.name ?? "");
     setChecklistTypeIndex(index);
-    
+
     setSelectedTemplateType(templateType[index]);
   };
   console.log(checklistTypeIndex);
@@ -194,13 +193,13 @@ export default function Home() {
     { name: "Australia" },
   ];
 
-  const [selectedChecklistTypeName, setSelectedChecklistTypeName] = useState(
-    "Select Checklist Type",
-  );
+  const [selectedChecklistTypeName, setSelectedChecklistTypeName] = useState<
+    string | null
+  >(null);
   const [
     selectedChecklistTemplateTypeName,
     setSelectedChecklistTemplateTypeName,
-  ] = useState("Select Checklist Template");
+  ] = useState<string | null>(null);
 
   const handleTemplateTypChange = (index: string) => {
     setSelectedContractTemplateName(index);
@@ -210,26 +209,17 @@ export default function Home() {
     ChecklistTemplate[0],
   );
 
-  useEffect(() => {
-    if (checklistTypeIndex) {
-      setSelectedChecklistTypeName(
-        ChecklistType[checklistTypeIndex]?.name ?? "",
-      );
-    }
-  }, [checklistTypeIndex]);
-
-  const [selectedGeograhyName, setSelectedGeograhyName] =
-    useState("Select Geography");
+  const [selectedGeograhyName, setSelectedGeograhyName] = useState<
+    string | null
+  >(null);
   const handleGeographyChange = (index: string) => {
     setSelectedGeograhyName(index);
   };
 
   const handleChecklistTypeChange = (index: number) => {
-    if (ChecklistType[checklistTypeIndex]) {
-      setSelectedChecklistTypeName(
-        ChecklistType[checklistTypeIndex]?.name ?? "",
-      );
-      const selectedTemplates = ChecklistTemplate[checklistTypeIndex] ?? [];
+    if (ChecklistType[index]) {
+      setSelectedChecklistTypeName(ChecklistType[index]?.name ?? "");
+      const selectedTemplates = ChecklistTemplate[index] ?? [];
       setSelectedChecklistType(selectedTemplates);
       if (selectedTemplates.length > 0) {
         setSelectedChecklistTemplateTypeName(selectedTemplates[0]?.name ?? "");
@@ -238,6 +228,14 @@ export default function Home() {
       }
     }
   };
+
+  useEffect(() => {
+    if (checklistTypeIndex) {
+      setSelectedChecklistTypeName(
+        ChecklistType[checklistTypeIndex]?.name ?? selectedChecklistTypeName,
+      );
+    }
+  }, [checklistTypeIndex]);
   const handleChecklistTemplateTypChange = (index: string) => {
     setSelectedChecklistTemplateTypeName(index);
   };
@@ -275,6 +273,7 @@ export default function Home() {
     if (hiddenInputRef.current) {
       hiddenInputRef.current.value = "";
     }
+    setExtractedText(null);
   };
 
   const handleSubmit = async (files: FileArray) => {
@@ -353,6 +352,7 @@ export default function Home() {
       console.error("Error uploading file:", error);
     }
   };
+
   return (
     <>
       <div
@@ -396,6 +396,58 @@ export default function Home() {
             </div>
 
             <div className=" flex  w-full   justify-center rounded-xl  bg-white px-2">
+              <div className=" flex flex-col justify-center bg-white  ">
+                <div className="flex items-center justify-center px-5 pb-6">
+                  <div className=" dropdown relative z-[10000] inline-block text-left">
+                    <span className="rounded-md shadow-sm">
+                      <button
+                        className="focus: focus:shadow-outline-blue inline-flex w-full justify-center rounded-md border border-gray-300 bg-[#f5f5f5] px-4 py-2 text-sm font-medium leading-5 text-gray-700 transition duration-150 ease-in-out hover:text-gray-500 focus:outline-none active:bg-gray-50 active:text-gray-800"
+                        type="button"
+                        aria-haspopup="true"
+                        aria-expanded="true"
+                        aria-controls="headlessui-menu-items-117"
+                      >
+                        <span>
+                          {selectedGeograhyName
+                            ? selectedGeograhyName
+                            : "Select Geography"}
+                        </span>
+                        <svg
+                          className="-mr-1 ml-2 h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                            clipRule="evenodd"
+                          ></path>
+                        </svg>
+                      </button>
+                    </span>
+                    <div className="dropdown-menu invisible origin-top-right -translate-y-2 scale-95 transform opacity-0 transition-all duration-300">
+                      <div
+                        className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md border border-gray-200 bg-white shadow-lg outline-none"
+                        aria-labelledby="headlessui-menu-button-1"
+                        role="menu"
+                      >
+                        <div className="py-1 text-black">
+                          {Geography.map((item, index) => (
+                            <p
+                              key={index}
+                              className="hover:duration-800 flex w-full justify-between px-4 py-2 text-left text-sm leading-5 text-black ease-in hover:scale-105 hover:cursor-pointer hover:font-semibold hover:transition-all"
+                              onClick={() => handleGeographyChange(item.name)}
+                            >
+                              {item.name}
+                            </p>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div className=" flex flex-col justify-center  bg-white  ">
                 <div className="flex items-center justify-center px-5 pb-6">
                   <div className=" dropdown relative z-[10000] inline-block text-left">
@@ -407,7 +459,11 @@ export default function Home() {
                         aria-expanded="true"
                         aria-controls="headlessui-menu-items-117"
                       >
-                        <span>{selectedContractTypeName}</span>
+                        <span>
+                          {selectedContractTypeName
+                            ? selectedContractTypeName
+                            : "Select Contract Type"}
+                        </span>
                         <svg
                           className="-mr-1 ml-2 h-5 w-5"
                           viewBox="0 0 20 20"
@@ -457,7 +513,11 @@ export default function Home() {
                         aria-expanded="true"
                         aria-controls="headlessui-menu-items-117"
                       >
-                        <span>{selectedContractTemplateName}</span>
+                        <span>
+                          {selectedContractTemplateName
+                            ? selectedContractTemplateName
+                            : "Select Contract Template"}
+                        </span>
                         <svg
                           className="-mr-1 ml-2 h-5 w-5"
                           viewBox="0 0 20 20"
@@ -499,54 +559,6 @@ export default function Home() {
 
               <div className=" flex flex-col justify-center bg-white  ">
                 <div className="flex items-center justify-center px-5 pb-6">
-                  <div className=" dropdown relative z-[10000] inline-block text-left">
-                    <span className="rounded-md shadow-sm">
-                      <button
-                        className="focus: focus:shadow-outline-blue inline-flex w-full justify-center rounded-md border border-gray-300 bg-[#f5f5f5] px-4 py-2 text-sm font-medium leading-5 text-gray-700 transition duration-150 ease-in-out hover:text-gray-500 focus:outline-none active:bg-gray-50 active:text-gray-800"
-                        type="button"
-                        aria-haspopup="true"
-                        aria-expanded="true"
-                        aria-controls="headlessui-menu-items-117"
-                      >
-                        <span>{selectedGeograhyName}</span>
-                        <svg
-                          className="-mr-1 ml-2 h-5 w-5"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                            clipRule="evenodd"
-                          ></path>
-                        </svg>
-                      </button>
-                    </span>
-                    <div className="dropdown-menu invisible origin-top-right -translate-y-2 scale-95 transform opacity-0 transition-all duration-300">
-                      <div
-                        className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md border border-gray-200 bg-white shadow-lg outline-none"
-                        aria-labelledby="headlessui-menu-button-1"
-                        role="menu"
-                      >
-                        <div className="py-1 text-black">
-                          {Geography.map((item, index) => (
-                            <p
-                              key={index}
-                              className="hover:duration-800 flex w-full justify-between px-4 py-2 text-left text-sm leading-5 text-black ease-in hover:scale-105 hover:cursor-pointer hover:font-semibold hover:transition-all"
-                              onClick={() => handleGeographyChange(item.name)}
-                            >
-                              {item.name}
-                            </p>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className=" flex flex-col justify-center bg-white  ">
-                <div className="flex items-center justify-center px-5 pb-6">
                   <div className=" dropdown  relative z-[10000] inline-block text-left">
                     <span className="rounded-md shadow-sm">
                       <button
@@ -556,7 +568,11 @@ export default function Home() {
                         aria-expanded="true"
                         aria-controls="headlessui-menu-items-117"
                       >
-                        <span>{selectedChecklistTypeName}</span>
+                        <span>
+                          {selectedChecklistTypeName
+                            ? selectedChecklistTypeName
+                            : "Select Checklist Types"}
+                        </span>
                         <svg
                           className="-mr-1 ml-2 h-5 w-5"
                           viewBox="0 0 20 20"
@@ -606,7 +622,11 @@ export default function Home() {
                         aria-expanded="true"
                         aria-controls="headlessui-menu-items-117"
                       >
-                        <span>{selectedChecklistTemplateTypeName}</span>
+                        <span>
+                          {selectedChecklistTemplateTypeName
+                            ? selectedChecklistTemplateTypeName
+                            : "Select Checklist Template"}
+                        </span>
                         <svg
                           className="-mr-1 ml-2 h-5 w-5"
                           viewBox="0 0 20 20"
@@ -651,6 +671,42 @@ export default function Home() {
           </div>
         </section>
         <section className="flex max-h-[550px] w-full    gap-4 px-8 pt-4">
+          {files.length !== 0 ? (
+            <div className="h-full w-full flex-1 overflow-x-auto rounded-xl bg-white  p-1 text-center">
+              {files.length !== 0 && (
+                <ul>
+                  {filePreviews.map((file) => (
+                    <li key={file.name} className="flex h-full">
+                      <article
+                        tabIndex={0}
+                        className="focus:shadow-outline group relative h-full w-full cursor-pointer rounded-md shadow-sm focus:outline-none"
+                      >
+                        {file.type === "application/pdf" ? (
+                          <iframe
+                            className="max-h-[520px] min-h-[519px]  w-full rounded-xl bg-red-400 text-center"
+                            src={`${file.url}#toolbar=0`}
+                            title={file.name}
+                          />
+                        ) : (
+                          <div className="flex h-full items-center justify-center bg-white">
+                            <p className="font-semibold text-black">
+                              <img src="/search.gif" alt="" />
+                            </p>
+                          </div>
+                        )}
+                      </article>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ) : (
+            <div className=" l h- bg flex w-full flex-1 items-center justify-center rounded-xl bg-white p-1 text-center text-sm font-semibold text-black">
+              <div className="relative flex flex-col">
+                <img src="/ai.png" className=" h-[400px]" alt="" />
+              </div>
+            </div>
+          )}
           <div className="flex   w-[25%]  flex-col gap-3 rounded-2xl ">
             <div className=" h-[250px] max-h-[250px] flex-1 rounded-2xl  bg-white">
               {" "}
@@ -702,9 +758,9 @@ export default function Home() {
                           {" "}
                           <button
                             id="button"
-                            className={`${files.length > 0 ? "pointer-events-none brightness-50" : "pointer-events-auto"} focus:shadow-outline disabled:   mt-2 min-w-[130px]  rounded-md border-2 border-black bg-black px-3 py-2 text-sm text-white transition-all duration-300 ease-linear hover:scale-105 focus:outline-none `}
+                            className={`${files.length <= 0 && selectedChecklistTemplateTypeName !== null && selectedChecklistTypeName !== null && selectedContractTemplateName !== null && selectedContractTypeName !== null && selectedGeograhyName !== null ? "pointer-events-auto" : "pointer-events-none brightness-50"} focus:shadow-outline disabled:   mt-2 min-w-[130px]  rounded-md border-2 border-black bg-black px-3 py-2 text-sm text-white transition-all duration-300 ease-linear hover:scale-105 focus:outline-none `}
                             onClick={() => hiddenInputRef.current?.click()}
-                            disabled={!files || isUploading}
+                            disabled={!files && isUploading}
                           >
                             Select File
                           </button>
@@ -721,8 +777,8 @@ export default function Home() {
                               className="flex h-full w-full flex-col items-center  justify-center text-center"
                             >
                               <img
-                                className="mx-auto w-32"
-                                src="https://user-images.githubusercontent.com/507615/54591670-ac0a0180-4a65-11e9-846c-e55ffce0fe7b.png"
+                                className="mx-auto w-32 object-cover"
+                                src="/nofile.jpg"
                                 alt="no data"
                               />
                               <span className="text-sm text-gray-500">
@@ -803,41 +859,8 @@ export default function Home() {
                 </CircularProgressbarWithChildren>
               </div>
             </div>
-          </div>{" "}
-          {files.length !== 0 ? (
-            <div className="h-full w-full flex-1 overflow-x-auto rounded-xl bg-white  p-1 text-center">
-              {files.length !== 0 && (
-                <ul>
-                  {filePreviews.map((file) => (
-                    <li key={file.name} className="flex h-full">
-                      <article
-                        tabIndex={0}
-                        className="focus:shadow-outline group relative h-full w-full cursor-pointer rounded-md shadow-sm focus:outline-none"
-                      >
-                        {file.type === "application/pdf" ? (
-                          <iframe
-                            className="max-h-[520px] min-h-[519px]  w-full rounded-xl bg-red-400 text-center"
-                            src={`${file.url}#toolbar=0`}
-                            title={file.name}
-                          />
-                        ) : (
-                          <div className="flex h-full items-center justify-center bg-white">
-                            <p className="font-semibold text-black">
-                              Document Preview
-                            </p>
-                          </div>
-                        )}
-                      </article>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          ) : (
-            <div className=" l h- bg flex w-full flex-1 items-center justify-center rounded-xl bg-white p-1 text-center text-sm font-semibold text-black">
-              <p>Document Preview</p>
-            </div>
-          )}
+          </div>
+
           <div
             className={`r flex h-[530px] flex-1 items-center justify-center rounded-xl bg-white  p-2 text-justify text-xs text-black ${
               extractedText
@@ -854,7 +877,9 @@ export default function Home() {
                 isDocumentUploading ||
                 isUploading ||
                 files.length > 0 ? (
-                  <ThreeDotsWaveMain />
+                  <img src="/icon.gif" alt="" />
+                ) : isDocumentUploading ? (
+                  <img src="/upload.gif" alt="" />
                 ) : (
                   "Analysis/Recommendations"
                 )
@@ -864,8 +889,10 @@ export default function Home() {
                 >
                   {extractedText}
                 </div>
+              ) : isDocumentUploading ? (
+                <img src="/upload.gif" alt="" />
               ) : (
-                <p className="font-semibold">Analysis/Recommendations</p>
+                <img src="/ocr2.gif" />
               )}
             </div>
           </div>
