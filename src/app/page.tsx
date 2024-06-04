@@ -1,19 +1,20 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { convertFileToBase64 } from "~/utils/fileUtils";
+
+import axios from "axios";
+import { useRouter } from "next/navigation";
 import {
   buildStyles,
   CircularProgressbarWithChildren,
 } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
-import { useRouter } from "next/navigation";
-import axios from "axios";
 import { api } from "~/trpc/react";
-import ThreeDotsWaveMain from "./ThreeDotWaveMain";
+import { convertFileToBase64 } from "~/utils/fileUtils";
+import { IoDocumentOutline } from "react-icons/io5";
+import { generateQuestionsArray } from "~/utils/gptUtil";
+
 type FileArray = File[];
-interface FilePreviewProps {
-  files: File[];
-}
+
 export default function Home() {
   const [fileKey, setFileKey] = useState<string | null>(null);
   const [extractedText, setExtractedText] = useState<string | null>(null);
@@ -125,10 +126,9 @@ export default function Home() {
   const handleContractTypeChange = (index: number) => {
     setSelectedContractTypeName(contractTypeList[index]?.name ?? "");
     setChecklistTypeIndex(index);
-
-    setSelectedTemplateType(templateType[index]);
+    setSelectedChecklistTypeName(ChecklistType[checklistTypeIndex]?.name ?? "");
+    const selectedTemplates = templateType[index] ?? [];
   };
-  console.log(checklistTypeIndex);
 
   const ChecklistType = [
     { name: "Supply Agreements" },
@@ -217,16 +217,15 @@ export default function Home() {
   };
 
   const handleChecklistTypeChange = (index: number) => {
-    if (ChecklistType[index]) {
-      setSelectedChecklistTypeName(ChecklistType[index]?.name ?? "");
-      const selectedTemplates = ChecklistTemplate[index] ?? [];
-      setSelectedChecklistType(selectedTemplates);
-      if (selectedTemplates.length > 0) {
-        setSelectedChecklistTemplateTypeName(selectedTemplates[0]?.name ?? "");
-      } else {
-        setSelectedChecklistTemplateTypeName("Select Checklist Template");
-      }
-    }
+    console.log(checklistTypeIndex);
+    setSelectedChecklistTypeName(ChecklistType[index]?.name ?? "");
+    const selectedTemplates = ChecklistTemplate[index] ?? [];
+    setSelectedChecklistType(selectedTemplates);
+    // if (selectedTemplates.length > 0) {
+    //   setSelectedChecklistTemplateTypeName(selectedTemplates[0]?.name ?? "");
+    // } else {
+    //   setSelectedChecklistTemplateTypeName("Select Checklist Template");
+    // }
   };
 
   useEffect(() => {
@@ -255,16 +254,16 @@ export default function Home() {
     overlayRef.current?.classList.remove("draggedover");
   };
 
-  const handleDragOver = (event: React.DragEvent) => {
-    event.preventDefault();
-    if (Array.from(event.dataTransfer.types).indexOf("Files") > -1) {
-      overlayRef.current?.classList.add("draggedover");
-    }
-  };
+  // const handleDragOver = (event: React.DragEvent) => {
+  //   event.preventDefault();
+  //   if (Array.from(event.dataTransfer.types).indexOf("Files") > -1) {
+  //     overlayRef.current?.classList.add("draggedover");
+  //   }
+  // };
 
-  const handleDragLeave = () => {
-    overlayRef.current?.classList.remove("draggedover");
-  };
+  // const handleDragLeave = () => {
+  //   overlayRef.current?.classList.remove("draggedover");
+  // };
 
   const handleDelete = (file: File) => {
     setFiles((prevFiles) => prevFiles.filter((f) => f !== file));
@@ -275,8 +274,19 @@ export default function Home() {
     }
     setExtractedText(null);
   };
+  useEffect(() => {
+    const concatenatedQuestions = generateQuestionsArray(
+      "Quality Standards Compliance",
+    );
+    console.log(concatenatedQuestions);
+  }, []);
 
   const handleSubmit = async (files: FileArray) => {
+    const concatenatedQuestions = generateQuestionsArray(
+      "Quality Standards Compliance",
+    );
+    console.log(concatenatedQuestions);
+
     if (files.length === 0) {
       alert("No files selected");
       return;
@@ -321,6 +331,8 @@ export default function Home() {
         fileKey,
         token: authTokenReq,
       });
+      const text=generateQuestionsArray(selectedChecklistTemplateTypeName ?? "");
+      console.log(text,"while jh")
     }
   };
 
@@ -703,7 +715,7 @@ export default function Home() {
           ) : (
             <div className=" l h- bg flex w-full flex-1 items-center justify-center rounded-xl bg-white p-1 text-center text-sm font-semibold text-black">
               <div className="relative flex flex-col">
-                <img src="/ai.png" className=" h-[400px]" alt="" />
+                <img src="/ai.png" className=" h-[200px]" alt="" />
               </div>
             </div>
           )}
@@ -774,10 +786,10 @@ export default function Home() {
                           {files.length === 0 ? (
                             <li
                               id="empty"
-                              className="flex h-full w-full flex-col items-center  justify-center text-center"
+                              className="mt-8 flex h-full w-full flex-col  items-center justify-center text-center"
                             >
                               <img
-                                className="mx-auto w-32 object-cover"
+                                className="mx-auto h-16 object-cover"
                                 src="/nofile.jpg"
                                 alt="no data"
                               />
@@ -877,7 +889,7 @@ export default function Home() {
                 isDocumentUploading ||
                 isUploading ||
                 files.length > 0 ? (
-                  <img src="/icon.gif" alt="" />
+                  <img src="/icon2.gif" className="h-24" alt="" />
                 ) : isDocumentUploading ? (
                   <img src="/upload.gif" alt="" />
                 ) : (
@@ -892,7 +904,12 @@ export default function Home() {
               ) : isDocumentUploading ? (
                 <img src="/upload.gif" alt="" />
               ) : (
-                <img src="/ocr2.gif" />
+                <div className="flex h-full w-full items-center justify-center">
+                  {" "}
+                  <div className="flex h-20 w-20 items-center justify-center rounded-full border-2 border-black ">
+                    <IoDocumentOutline size={35} />
+                  </div>
+                </div>
               )}
             </div>
           </div>
