@@ -40,6 +40,16 @@ export default function Home() {
       },
     });
 
+  const { mutate: analyzeText, isPending: isAnalyzing } =
+    api.document.analyzeDocument.useMutation({
+      onSuccess: (data) => {
+        console.log(data);
+      },
+      onError: (error) => {
+        alert(error.message);
+      },
+    });
+
   const router = useRouter();
   const contractTypeList = [
     { name: "Supply Agreements" },
@@ -331,8 +341,24 @@ export default function Home() {
         fileKey,
         token: authTokenReq,
       });
-      const text=generateQuestionsArray(selectedChecklistTemplateTypeName ?? "");
-      console.log(text,"while jh")
+      const text = generateQuestionsArray(
+        selectedChecklistTemplateTypeName ?? "",
+      );
+      console.log(text, "while jh");
+    }
+  };
+
+  const handleAnalyze = () => {
+    if (fileKey) {
+      const authTokenReq = process.env.NEXT_PUBLIC_AUTH_TOKEN_REQ;
+      if (!authTokenReq) {
+        throw new Error("Missing Token");
+      }
+      analyzeText({
+        ocrOutput: extractedText ?? "",
+        contractType: "Quality Standards Compliance",
+        token: authTokenReq,
+      });
     }
   };
 
@@ -899,6 +925,13 @@ export default function Home() {
                 <div
                   className={`p-5 ${extractedText.length > 200 ? "h-full overflow-y-scroll" : ""}`}
                 >
+                  <button
+                    className="rounded-md bg-red-600 p-2 text-white"
+                    onClick={handleAnalyze}
+                    disabled={isAnalyzing}
+                  >
+                    Analyze
+                  </button>
                   {extractedText}
                 </div>
               ) : isDocumentUploading ? (

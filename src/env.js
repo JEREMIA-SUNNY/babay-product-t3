@@ -11,6 +11,7 @@ export const env = createEnv({
     GOOGLE_API_KEY: z.string(),
     BUCKET_NAME: z.string(),
     AUTH_TOKEN_REQ: z.string(),
+    OPENAI_API_KEY: z.string(),
   },
 
   /**
@@ -28,6 +29,7 @@ export const env = createEnv({
    */
   runtimeEnv: {
     APP_ENV: process.env.APP_ENV,
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
     GOOGLE_API_KEY: process.env.GOOGLE_API_KEY,
     BUCKET_NAME: process.env.BUCKET_NAME,
     AUTH_TOKEN_REQ: process.env.AUTH_TOKEN_REQ,
