@@ -806,7 +806,7 @@ export default function Home() {
                             selectedGeograhyName !== null && (
                               <button
                                 id="button"
-                                className={`${files.length <= 0 ? "pointer-events-auto" : "pointer-events-none brightness-50"} focus:shadow-outline disabled:   mt-2 min-w-[130px]  rounded-md border-2 border-black bg-black px-3 py-2 text-sm text-white transition-all duration-300 ease-linear hover:scale-105 focus:outline-none `}
+                                className={`${files.length <= 0 ? "pointer-events-auto" : "pointer-events-none brightness-50"} focus:shadow-outline disabled: mt-2   mt-4 min-w-[130px]  rounded-md border-2 border-black bg-black px-3 py-2 text-sm text-white transition-all duration-300 ease-linear hover:scale-105 focus:outline-none `}
                                 onClick={() => hiddenInputRef.current?.click()}
                                 disabled={!files && isUploading}
                               >
@@ -883,11 +883,11 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div className="  h-[260px] rounded-2xl   bg-white   ">
+            <div className="  h-[280px] rounded-2xl   bg-white   ">
               <p className="mt-4 pb-4 text-center text-sm font-semibold text-black ">
                 Compliance Score
               </p>
-              <div className="md:px-32">
+              <div className="pt-8 md:px-32">
                 <CircularProgressbarWithChildren
                   styles={buildStyles({
                     textColor: "red",
@@ -918,12 +918,16 @@ export default function Home() {
               {!extractedTexts && fileKey ? (
                 isExtractingText || files.length > 0 ? (
                   <div className="relative">
-                    <p className="absolute mt-12 w-full">Reading File</p>
+                    <p className="absolute mt-12 w-full min-w-[120px] text-sm font-semibold text-black">
+                      Reading File
+                    </p>
                     <ThreeDotsWaveMain />
                   </div>
                 ) : !isDocumentUploading ? (
                   <div className="relative">
-                    <p className="absolute mt-12 w-full">Reading File</p>
+                    <p className="absolute mt-12 w-full min-w-[120px] text-sm font-semibold text-black">
+                      Reading File
+                    </p>
                     <ThreeDotsWaveMain />
                   </div>
                 ) : (
@@ -934,19 +938,21 @@ export default function Home() {
               ) : extractedTexts ? (
                 analyzeTextGpt ? (
                   <div
-                    className={`p-5 ${extractedTexts.length > 200 ? "h-full overflow-y-scroll text-xs" : ""}`}
+                    className={`p-5 h-full overflow-y-auto text-xs`}
                   >
                     {analyzeTextGpt}
                   </div>
                 ) : (
                   <div className="relative">
-                    <p className="absolute mt-12 w-full">Analyzing file</p>
+                    <p className="absolute mt-12 w-full min-w-[120px] text-sm font-semibold text-black">
+                      Analyzing file
+                    </p>
                     <ThreeDotsWaveMain />
                   </div>
                 )
               ) : isDocumentUploading ? (
                 <div className="relative">
-                  <p className="absolute mt-12 w-full min-w-[100px] ">
+                  <p className="absolute mt-12  w-full min-w-[140px] text-sm font-semibold text-black ">
                     Uploading File 
                   </p>
                   <ThreeDotsWaveMain />

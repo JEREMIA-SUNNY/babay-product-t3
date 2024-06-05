@@ -1,6 +1,6 @@
 const checklistQuestions: Record<string, string[]> = {
   "Quality Standards Compliance": [
-    "1. Does the contract require compliance with relevant local and international quality standards (e.g., ASTM, ISO, EN)?",
+    "1. Is the contract in compliance with relevant local and international quality standards (e.g., ASTM, ISO, EN)?",
     "2. Are detailed technical specifications and quality requirements for the products clearly outlined in the contract?",
     "3. Does the contract specify the required quality and type of materials to be used?",
     "4. Are the manufacturing processes described in the contract to ensure consistency and quality?",
