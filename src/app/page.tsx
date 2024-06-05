@@ -14,11 +14,12 @@ import { IoDocumentOutline } from "react-icons/io5";
 import { generateQuestionsArray } from "~/utils/gptUtil";
 import { MdDocumentScanner } from "react-icons/md";
 import { RiRobot2Fill } from "react-icons/ri";
+import ThreeDotsWaveMain from "./ThreeDotWaveMain";
 type FileArray = File[];
 
 export default function Home() {
   const [fileKey, setFileKey] = useState<string | null>(null);
-  const [extractedText, setExtractedText] = useState<string | null>(null);
+  const [extractedTexts, setExtractedTexts] = useState<string | null>(null);
 
   const { mutate: uploadDocument, isPending: isDocumentUploading } =
     api.document.uploadDocument.useMutation({
@@ -34,7 +35,7 @@ export default function Home() {
   const { mutate: extractText, isPending: isExtractingText } =
     api.document.extractDocument.useMutation({
       onSuccess: (data) => {
-        setExtractedText(data);
+        setExtractedTexts(data);
         handleAnalyze();
       },
       onError: (error) => {
@@ -277,15 +278,17 @@ export default function Home() {
   // const handleDragLeave = () => {
   //   overlayRef.current?.classList.remove("draggedover");
   // };
-
+  let percentage = 85;
   const handleDelete = (file: File) => {
     setFiles((prevFiles) => prevFiles.filter((f) => f !== file));
     setFileKey(null);
-    setExtractedText(null);
+    setExtractedTexts(null);
     if (hiddenInputRef.current) {
       hiddenInputRef.current.value = "";
     }
-    setExtractedText(null);
+    setExtractedTexts(null);
+    setAnalyzeTextGpt(null);
+    percentage = 0;
   };
   useEffect(() => {
     const concatenatedQuestions = generateQuestionsArray(
@@ -327,7 +330,6 @@ export default function Home() {
     setFiles([]);
   };
 
-  const percentage = 85;
   const handleLogout = () => {
     localStorage.setItem("isLoggedIn", "false");
 
@@ -358,7 +360,7 @@ export default function Home() {
         throw new Error("Missing Token");
       }
       analyzeText({
-        ocrOutput: extractedText ?? "",
+        ocrOutput: extractedTexts ?? "",
         contractType: "Quality Standards Compliance",
         token: authTokenReq,
       });
@@ -892,7 +894,7 @@ export default function Home() {
                     pathColor: "green",
                     trailColor: "#ebecf0",
                   })}
-                  value={percentage}
+                  value={analyzeTextGpt ? percentage : 0}
                 >
                   {" "}
                   <div style={{ fontSize: 18, marginTop: -5, color: "black" }}>
@@ -905,42 +907,50 @@ export default function Home() {
 
           <div
             className={`r flex h-[530px] flex-1 items-center justify-center rounded-xl bg-white  p-2 text-justify text-xs text-black ${
-              extractedText
-                ? extractedText.length > 200
+              extractedTexts
+                ? extractedTexts.length > 200
                   ? "overflow-hidden"
                   : ""
                 : ""
             }`}
           >
             <div className="m flex h-full w-full items-center justify-center">
-              {!extractedText && fileKey ? (
-                isExtractingText ||
-                fileKey ||
-                isDocumentUploading ||
-                isUploading ||
-                files.length > 0 ? (
-                  <img src="/icon2.gif" className="h-24" alt="" />
-                ) : isDocumentUploading ? (
-                  <img src="/upload.gif" alt="" />
+              {!extractedTexts && fileKey ? (
+                isExtractingText || files.length > 0 ? (
+                  <div className="relative">
+                    <p className="absolute mt-12 w-full">Reading File</p>
+                    <ThreeDotsWaveMain />
+                  </div>
+                ) : !isDocumentUploading ? (
+                  <div className="relative">
+                    <p className="absolute mt-12 w-full">Reading File</p>
+                    <ThreeDotsWaveMain />
+                  </div>
                 ) : (
-                  "Analysis/Recommendations"
+                  <div className="flex  items-center justify-center rounded-full  ">
+                    <RiRobot2Fill size={60} />
+                  </div>
                 )
-              ) : extractedText ? (
+              ) : extractedTexts ? (
                 analyzeTextGpt ? (
                   <div
-                    className={`p-5 ${extractedText.length > 200 ? "h-full overflow-y-scroll text-sm" : ""}`}
+                    className={`p-5 ${extractedTexts.length > 200 ? "h-full overflow-y-scroll text-xs" : ""}`}
                   >
                     {analyzeTextGpt}
                   </div>
                 ) : (
-                  <img
-                    src="/chatGPTs.PNG"
-                    className="h-20 animate-spin"
-                    alt=""
-                  />
+                  <div className="relative">
+                    <p className="absolute mt-12 w-full">Analyzing file</p>
+                    <ThreeDotsWaveMain />
+                  </div>
                 )
               ) : isDocumentUploading ? (
-                <img src="/upload.gif" alt="" />
+                <div className="relative">
+                  <p className="absolute mt-12 w-full min-w-[100px] ">
+                    Uploading File 
+                  </p>
+                  <ThreeDotsWaveMain />
+                </div>
               ) : (
                 <div className="flex h-full w-full items-center justify-center">
                   {" "}
