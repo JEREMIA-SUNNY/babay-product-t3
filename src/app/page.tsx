@@ -12,7 +12,8 @@ import { api } from "~/trpc/react";
 import { convertFileToBase64 } from "~/utils/fileUtils";
 import { IoDocumentOutline } from "react-icons/io5";
 import { generateQuestionsArray } from "~/utils/gptUtil";
-
+import { MdDocumentScanner } from "react-icons/md";
+import { RiRobot2Fill } from "react-icons/ri";
 type FileArray = File[];
 
 export default function Home() {
@@ -34,16 +35,18 @@ export default function Home() {
     api.document.extractDocument.useMutation({
       onSuccess: (data) => {
         setExtractedText(data);
+        handleAnalyze();
       },
       onError: (error) => {
         alert(error.message);
       },
     });
-
+  const [analyzeTextGpt, setAnalyzeTextGpt] = useState<string | null>(null);
   const { mutate: analyzeText, isPending: isAnalyzing } =
     api.document.analyzeDocument.useMutation({
       onSuccess: (data) => {
         console.log(data);
+        setAnalyzeTextGpt(data);
       },
       onError: (error) => {
         alert(error.message);
@@ -741,12 +744,12 @@ export default function Home() {
           ) : (
             <div className=" l h- bg flex w-full flex-1 items-center justify-center rounded-xl bg-white p-1 text-center text-sm font-semibold text-black">
               <div className="relative flex flex-col">
-                <img src="/ai.png" className=" h-[200px]" alt="" />
+                <MdDocumentScanner size={60} />
               </div>
             </div>
           )}
           <div className="flex   w-[25%]  flex-col gap-3 rounded-2xl ">
-            <div className=" h-[250px] max-h-[250px] flex-1 rounded-2xl  bg-white">
+            <div className=" h-[250px] max-h-[250px] flex-1 items-center justify-center rounded-2xl  bg-white">
               {" "}
               <div>
                 {" "}
@@ -762,9 +765,9 @@ export default function Home() {
 
                     <article
                       aria-label="File Upload Modal"
-                      className="bg-w relative flex h-full flex-col  rounded-md"
+                      className="bg-w relative flex min-h-[200px] flex-col    rounded-md"
                     >
-                      <section className="flex   h-full  w-full flex-col">
+                      <section className="flex h-full min-h-[200px] w-full flex-col  items-center justify-center">
                         <input
                           id="hidden-input"
                           type="file"
@@ -794,19 +797,25 @@ export default function Home() {
                         />
                         <div className="flex justify-center gap-4">
                           {" "}
-                          <button
-                            id="button"
-                            className={`${files.length <= 0 && selectedChecklistTemplateTypeName !== null && selectedChecklistTypeName !== null && selectedContractTemplateName !== null && selectedContractTypeName !== null && selectedGeograhyName !== null ? "pointer-events-auto" : "pointer-events-none brightness-50"} focus:shadow-outline disabled:   mt-2 min-w-[130px]  rounded-md border-2 border-black bg-black px-3 py-2 text-sm text-white transition-all duration-300 ease-linear hover:scale-105 focus:outline-none `}
-                            onClick={() => hiddenInputRef.current?.click()}
-                            disabled={!files && isUploading}
-                          >
-                            Select File
-                          </button>
+                          {selectedChecklistTemplateTypeName !== null &&
+                            selectedChecklistTypeName !== null &&
+                            selectedContractTemplateName !== null &&
+                            selectedContractTypeName !== null &&
+                            selectedGeograhyName !== null && (
+                              <button
+                                id="button"
+                                className={`${files.length <= 0 ? "pointer-events-auto" : "pointer-events-none brightness-50"} focus:shadow-outline disabled:   mt-2 min-w-[130px]  rounded-md border-2 border-black bg-black px-3 py-2 text-sm text-white transition-all duration-300 ease-linear hover:scale-105 focus:outline-none `}
+                                onClick={() => hiddenInputRef.current?.click()}
+                                disabled={!files && isUploading}
+                              >
+                                Select File
+                              </button>
+                            )}
                         </div>
 
                         <ul
                           id="gallery"
-                          className="-m-1 flex flex-1 flex-wrap justify-center py-4 pl-2"
+                          className="-m-1 flex h-full flex-1 flex-wrap items-center justify-center py-4 pl-2"
                           ref={galleryRef}
                         >
                           {files.length === 0 ? (
@@ -814,11 +823,6 @@ export default function Home() {
                               id="empty"
                               className="mt-8 flex h-full w-full flex-col  items-center justify-center text-center"
                             >
-                              <img
-                                className="mx-auto h-16 object-cover"
-                                src="/nofile.jpg"
-                                alt="no data"
-                              />
                               <span className="text-sm text-gray-500">
                                 No files selected
                               </span>
@@ -892,7 +896,7 @@ export default function Home() {
                 >
                   {" "}
                   <div style={{ fontSize: 18, marginTop: -5, color: "black" }}>
-                    <strong> {percentage} %</strong>
+                    <strong> {analyzeTextGpt ? percentage : 0} %</strong>
                   </div>
                 </CircularProgressbarWithChildren>
               </div>
@@ -922,25 +926,26 @@ export default function Home() {
                   "Analysis/Recommendations"
                 )
               ) : extractedText ? (
-                <div
-                  className={`p-5 ${extractedText.length > 200 ? "h-full overflow-y-scroll" : ""}`}
-                >
-                  <button
-                    className="rounded-md bg-red-600 p-2 text-white"
-                    onClick={handleAnalyze}
-                    disabled={isAnalyzing}
+                analyzeTextGpt ? (
+                  <div
+                    className={`p-5 ${extractedText.length > 200 ? "h-full overflow-y-scroll text-sm" : ""}`}
                   >
-                    Analyze
-                  </button>
-                  {extractedText}
-                </div>
+                    {analyzeTextGpt}
+                  </div>
+                ) : (
+                  <img
+                    src="/chatGPTs.PNG"
+                    className="h-20 animate-spin"
+                    alt=""
+                  />
+                )
               ) : isDocumentUploading ? (
                 <img src="/upload.gif" alt="" />
               ) : (
                 <div className="flex h-full w-full items-center justify-center">
                   {" "}
-                  <div className="flex h-20 w-20 items-center justify-center rounded-full border-2 border-black ">
-                    <IoDocumentOutline size={35} />
+                  <div className="flex  items-center justify-center rounded-full  ">
+                    <RiRobot2Fill size={60} />
                   </div>
                 </div>
               )}

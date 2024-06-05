@@ -27,7 +27,7 @@ ${ocrOutput}
 
     para 1 should contain summary. para 2 should contain recommendations
 
-summary - what s not proper as per the questions asked
+summary - whats not proper as per the questions asked
 
 recommendations - what can be improved.
 
