@@ -10,11 +10,12 @@ import {
 import "react-circular-progressbar/dist/styles.css";
 import { api } from "~/trpc/react";
 import { convertFileToBase64 } from "~/utils/fileUtils";
-import { IoDocumentOutline } from "react-icons/io5";
+
 import { generateQuestionsArray } from "~/utils/gptUtil";
 import { MdDocumentScanner } from "react-icons/md";
 import { RiRobot2Fill } from "react-icons/ri";
 import ThreeDotsWaveMain from "./ThreeDotWaveMain";
+import { IoMdLogOut } from "react-icons/io";
 type FileArray = File[];
 
 export default function Home() {
@@ -268,16 +269,6 @@ export default function Home() {
     overlayRef.current?.classList.remove("draggedover");
   };
 
-  // const handleDragOver = (event: React.DragEvent) => {
-  //   event.preventDefault();
-  //   if (Array.from(event.dataTransfer.types).indexOf("Files") > -1) {
-  //     overlayRef.current?.classList.add("draggedover");
-  //   }
-  // };
-
-  // const handleDragLeave = () => {
-  //   overlayRef.current?.classList.remove("draggedover");
-  // };
   let percentage = 85;
   const handleDelete = (file: File) => {
     setFiles((prevFiles) => prevFiles.filter((f) => f !== file));
@@ -402,34 +393,7 @@ export default function Home() {
         onClick={handleLogout}
         className="items-  fixed right-14 top-8 z-[1000] flex h-2  gap-4 text-black transition-all duration-700 ease-in-out hover:scale-105 hover:cursor-pointer"
       >
-        <svg
-          className="mt-1"
-          version="1.1"
-          id="Capa_1"
-          xmlns="http://www.w3.org/2000/svg"
-          xmlnsXlink="http://www.w3.org/1999/xlink"
-          x="0px"
-          y="0px"
-          width="20.943px"
-          height="20.943px"
-          viewBox="0 0 96.943 96.943"
-          xmlSpace="preserve"
-        >
-          <g>
-            <g>
-              <path
-                d="M61.168,83.92H11.364V13.025H61.17c1.104,0,2-0.896,2-2V3.66c0-1.104-0.896-2-2-2H2c-1.104,0-2,0.896-2,2v89.623
-         c0,1.104,0.896,2,2,2h59.168c1.105,0,2-0.896,2-2V85.92C63.168,84.814,62.274,83.92,61.168,83.92z"
-              />
-              <path
-                d="M96.355,47.058l-26.922-26.92c-0.75-0.751-2.078-0.75-2.828,0l-6.387,6.388c-0.781,0.781-0.781,2.047,0,2.828
-         l12.16,12.162H19.737c-1.104,0-2,0.896-2,2v9.912c0,1.104,0.896,2,2,2h52.644L60.221,67.59c-0.781,0.781-0.781,2.047,0,2.828
-         l6.387,6.389c0.375,0.375,0.885,0.586,1.414,0.586c0.531,0,1.039-0.211,1.414-0.586l26.922-26.92
-         c0.375-0.375,0.586-0.885,0.586-1.414C96.943,47.941,96.73,47.433,96.355,47.058z"
-              />
-            </g>
-          </g>
-        </svg>
+        <IoMdLogOut size={35} />
       </div>
       <main className="flex min-h-screen w-full flex-col items-center  bg-[#f5f5f5] ">
         <section className="r  4 w-full bg-white">
@@ -713,7 +677,7 @@ export default function Home() {
             </div>
           </div>
         </section>
-        <section className="flex max-h-[550px] w-full    gap-4 px-8 pt-4">
+        <section className="flex w-full flex-col  gap-4 px-8   pt-4 md:max-h-[550px] md:flex-row">
           {files.length !== 0 ? (
             <div className="h-full w-full flex-1 overflow-x-auto rounded-xl bg-white  p-1 text-center">
               {files.length !== 0 && (
@@ -750,8 +714,8 @@ export default function Home() {
               </div>
             </div>
           )}
-          <div className="flex   w-[25%]  flex-col gap-3 rounded-2xl ">
-            <div className=" h-[250px] max-h-[250px] flex-1 items-center justify-center rounded-2xl  bg-white">
+          <div className="flex   flex-col  gap-3 rounded-2xl md:w-[25%] ">
+            <div className=" flex-1 items-center justify-center rounded-2xl bg-white md:h-[250px]  md:max-h-[250px]">
               {" "}
               <div>
                 {" "}
@@ -767,9 +731,9 @@ export default function Home() {
 
                     <article
                       aria-label="File Upload Modal"
-                      className="bg-w relative flex min-h-[200px] flex-col    rounded-md"
+                      className="bg-w relative flex flex-col rounded-md    md:min-h-[200px]"
                     >
-                      <section className="flex h-full min-h-[200px] w-full flex-col  items-center justify-center">
+                      <section className="flex h-full w-full flex-col items-center  justify-center md:min-h-[200px]">
                         <input
                           id="hidden-input"
                           type="file"
@@ -883,11 +847,11 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div className="  h-[280px] rounded-2xl   bg-white   ">
+            <div className="  rounded-2xl bg-white   md:h-[280px]   ">
               <p className="mt-4 pb-4 text-center text-sm font-semibold text-black ">
                 Compliance Score
               </p>
-              <div className="pt-8 md:px-32">
+              <div className="px-32 pt-8 md:px-28 2xl:px-32">
                 <CircularProgressbarWithChildren
                   styles={buildStyles({
                     textColor: "red",
@@ -914,7 +878,7 @@ export default function Home() {
                 : ""
             }`}
           >
-            <div className="m flex h-full w-full items-center justify-center">
+            <div className="m flex h-full w-full flex-col items-center justify-center  px-4">
               {!extractedTexts && fileKey ? (
                 isExtractingText || files.length > 0 ? (
                   <div className="relative">
@@ -937,9 +901,7 @@ export default function Home() {
                 )
               ) : extractedTexts ? (
                 analyzeTextGpt ? (
-                  <div
-                    className={`p-5 h-full overflow-y-auto text-xs`}
-                  >
+                  <div className={`h-full overflow-y-auto p-5 text-xs`}>
                     {analyzeTextGpt}
                   </div>
                 ) : (
@@ -965,6 +927,29 @@ export default function Home() {
                   </div>
                 </div>
               )}
+
+              {analyzeTextGpt ? (
+                <div className="flex h-[25%] w-full flex-col  items-center justify-center gap-2 border-t-2 px-6">
+                  <div className="pt-5">
+                    Would you like me to rewrite the contract with the
+                    recommended changes?
+                  </div>
+                  <div className="flex gap-4 pb-8 pt-2">
+                    <button
+                      id="button"
+                      className={`focus:shadow-outline disabled:  h-fit  min-w-[100px] rounded-md border-2 border-black bg-black px-3 py-2 text-sm text-white transition-all duration-300 ease-linear hover:scale-105 focus:outline-none `}
+                    >
+                      Yes
+                    </button>
+                    <button
+                      id="button"
+                      className={` focus:shadow-outline disabled:  h-fit  min-w-[100px] rounded-md border-2 border-black  px-3 py-2 text-sm text-black transition-all duration-300 ease-linear hover:scale-105 focus:outline-none `}
+                    >
+                      No
+                    </button>
+                  </div>
+                </div>
+              ) : null}
             </div>
           </div>
         </section>
