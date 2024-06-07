@@ -11,11 +11,11 @@ import "react-circular-progressbar/dist/styles.css";
 import { api } from "~/trpc/react";
 import { convertFileToBase64 } from "~/utils/fileUtils";
 
-import { generateQuestionsArray } from "~/utils/gptUtil";
+import { IoMdLogOut } from "react-icons/io";
 import { MdDocumentScanner } from "react-icons/md";
 import { RiRobot2Fill } from "react-icons/ri";
+import { generateQuestionsArray } from "~/utils/gptUtil";
 import ThreeDotsWaveMain from "./ThreeDotWaveMain";
-import { IoMdLogOut } from "react-icons/io";
 type FileArray = File[];
 
 export default function Home() {
