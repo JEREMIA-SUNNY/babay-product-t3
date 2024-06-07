@@ -70,13 +70,11 @@ function page() {
                 className="h- rounded-lg object-contain"
                 alt=""
               />
-
-              <span className="mt-6 text-black">Enter Login Details</span>
             </div>
             <form onSubmit={handleLogin}>
               <div className="mb-4 text-base">
                 <input
-                  className="e placeholder:text- w-full rounded-md  border-none bg-[#d9d9d9] px-6 py-2 text-center text-inherit placeholder-black  "
+                  className="e w-full rounded-md border-none  bg-[#d9d9d9] px-6 py-2 text-center text-inherit placeholder-black placeholder:text-sm  "
                   type="text"
                   name="email"
                   placeholder="id@email.com"

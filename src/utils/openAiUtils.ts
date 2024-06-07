@@ -44,10 +44,9 @@ ${ocrOutput}
 
   * ${questions}
 
-Analyze the content of the uploaded document based on the checklist questions and provide a concise summary in a natural paragraph format not exceeding 750 characters. Avoid using markdown formatting and refer to the document as "the document."
+Analyze the content of the uploaded document based on the checklist questions and provide a concise summary in a natural paragraph format not exceeding 750 characters and minimum 500 characters. Avoid using markdown formatting and refer to the document as "the document."
 
-Additionally, based on the identified issues, suggest changes to the document so that it complies with the provided checklist in another paragraph not exceeding 750 characters. Avoid using markdown formatting and refer to the document as "the document."
-
+Additionally, based on the identified issues, suggest changes to the document so that it complies with the provided checklist in another paragraph not exceeding 750 characters and minimum 500 characters. Avoid using markdown formatting and refer to the document as "the document."
 After that, answer the checklist questions with true or false based on the content of the document. Format the output as a JSON object with the following structure:
 {
   "summary": "summary of the document",

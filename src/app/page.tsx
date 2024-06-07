@@ -873,7 +873,7 @@ export default function Home() {
           </div>
 
           <div
-            className={`r flex h-[530px] flex-1 items-center justify-center rounded-xl bg-white  p-2 text-justify text-xs text-black ${
+            className={`r flex h-[530px] flex-1 items-center justify-center rounded-xl bg-white   text-justify text-xs text-black ${
               extractedTexts
                 ? extractedTexts.length > 200
                   ? "overflow-hidden"
@@ -881,7 +881,7 @@ export default function Home() {
                 : ""
             }`}
           >
-            <div className="m flex h-full w-full flex-col items-center justify-center  px-4">
+            <div className="m -4 flex h-full w-full flex-col items-center  justify-center">
               {!extractedTexts && fileKey ? (
                 isExtractingText || files.length > 0 ? (
                   <div className="relative">
@@ -938,7 +938,7 @@ export default function Home() {
                     Would you like me to rewrite the contract with the
                     recommended changes?
                   </div>
-                  <div className="flex gap-4 pb-8 pt-2">
+                  <div className="flex gap-4 pb-5 pt-2">
                     <button
                       onClick={handleAnalyze}
                       id="button"
