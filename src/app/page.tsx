@@ -15,12 +15,15 @@ import { IoMdLogOut } from "react-icons/io";
 import { MdDocumentScanner } from "react-icons/md";
 import { RiRobot2Fill } from "react-icons/ri";
 import { generateQuestionsArray } from "~/utils/gptUtil";
+import { ChecklistItem } from "~/utils/openAiUtils";
+import SummaryAndChecklist from "./_components/SummaryAndCheckList";
 import ThreeDotsWaveMain from "./ThreeDotWaveMain";
 type FileArray = File[];
 
 export default function Home() {
   const [fileKey, setFileKey] = useState<string | null>(null);
   const [extractedTexts, setExtractedTexts] = useState<string | null>(null);
+  const [checkListResult, setCheckListResult] = useState<ChecklistItem[]>([]);
 
   const { mutate: uploadDocument, isPending: isDocumentUploading } =
     api.document.uploadDocument.useMutation({
@@ -47,8 +50,8 @@ export default function Home() {
   const { mutate: analyzeText, isPending: isAnalyzing } =
     api.document.analyzeDocument.useMutation({
       onSuccess: (data) => {
-        console.log(data);
-        setAnalyzeTextGpt(data);
+        setAnalyzeTextGpt(data.summary);
+        setCheckListResult(data.checklist);
       },
       onError: (error) => {
         alert(error.message);
@@ -901,9 +904,10 @@ export default function Home() {
                 )
               ) : extractedTexts ? (
                 analyzeTextGpt ? (
-                  <div className={`h-full overflow-y-auto p-5 text-xs`}>
-                    {analyzeTextGpt}
-                  </div>
+                  <SummaryAndChecklist
+                    summary={analyzeTextGpt}
+                    checklist={checkListResult}
+                  />
                 ) : (
                   <div className="relative">
                     <p className="absolute mt-12 w-full min-w-[120px] text-sm font-semibold text-black">
@@ -936,6 +940,7 @@ export default function Home() {
                   </div>
                   <div className="flex gap-4 pb-8 pt-2">
                     <button
+                      onClick={handleAnalyze}
                       id="button"
                       className={`focus:shadow-outline disabled:  h-fit  min-w-[100px] rounded-md border-2 border-black bg-black px-3 py-2 text-sm text-white transition-all duration-300 ease-linear hover:scale-105 focus:outline-none `}
                     >
