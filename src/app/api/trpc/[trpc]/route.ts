@@ -31,3 +31,10 @@ const handler = (req: NextRequest) =>
   });
 
 export { handler as GET, handler as POST };
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "10mb",
+    },
+  },
+};

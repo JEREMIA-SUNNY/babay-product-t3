@@ -7,7 +7,7 @@ const SummaryAndChecklist: React.FC<DocumentSummaryResponse> = ({
   checklist,
 }) => {
   return (
-    <div className="overflow-y-auto p-2 text-xs">
+    <div className="overflow-y-auto p-2  text-xs">
       <div className="mb-6 px-4 py-2">
         <h3 className=" mb-2 text-sm font-semibold">Summary</h3>
         <p className="text-xs">{summary}</p>
@@ -18,7 +18,7 @@ const SummaryAndChecklist: React.FC<DocumentSummaryResponse> = ({
           {checklist.map((item, index) => (
             <div
               key={index}
-              className="grid grid-cols-12 items-center rounded-lg bg-white px-4 py-2 shadow-md"
+              className="grid grid-cols-12 items-center rounded-lg bg-[#f5f5f5] px-4 py-2 "
             >
               <p className="col-span-10 text-xs text-black">{item.question}</p>
               <div className="col-span-2 flex justify-end">

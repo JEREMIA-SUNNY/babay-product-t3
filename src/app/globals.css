@@ -40,15 +40,3 @@ body {
     text-wrap: balance;
   }
 }
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-/* Optionally, you can style other scrollbar properties such as track and thumb */
-::-webkit-scrollbar-track {
-  background-color: #f1f1f1; /* Change track color if needed */
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: #888; /* Change thumb color if needed */
-}
