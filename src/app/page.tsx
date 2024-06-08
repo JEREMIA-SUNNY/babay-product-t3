@@ -235,7 +235,7 @@ export default function Home() {
   };
 
   const handleChecklistTypeChange = (index: number) => {
-    console.log(checklistTypeIndex);
+    
     setSelectedChecklistTypeName(ChecklistType[index]?.name ?? "");
     const selectedTemplates = ChecklistTemplate[index] ?? [];
     setSelectedChecklistType(selectedTemplates);
@@ -288,14 +288,14 @@ export default function Home() {
     const concatenatedQuestions = generateQuestionsArray(
       "Quality Standards Compliance",
     );
-    console.log(concatenatedQuestions);
+   
   }, []);
 
   const handleSubmit = async (files: FileArray) => {
     const concatenatedQuestions = generateQuestionsArray(
       "Quality Standards Compliance",
     );
-    console.log(concatenatedQuestions);
+
 
     if (files.length === 0) {
       alert("No files selected");
@@ -343,7 +343,7 @@ export default function Home() {
       const text = generateQuestionsArray(
         selectedChecklistTemplateTypeName ?? "",
       );
-      console.log(text, "while jh");
+    
     }
   };
 
