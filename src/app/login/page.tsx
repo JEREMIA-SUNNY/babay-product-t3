@@ -92,10 +92,10 @@ function page() {
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
-              <div className="mt-8 flex justify-center text-lg text-black">
+              <div className="mt-8 flex justify-center text-sm text-black">
                 <button
                   type="submit"
-                  className="t   h rounded-md bg-black px-10 py-2 text-white backdrop-blur-md transition-colors duration-300"
+                  className=" rounded-md bg-black px-8 py-2 text-white backdrop-blur-md transition-colors duration-300"
                 >
                   Login
                 </button>
