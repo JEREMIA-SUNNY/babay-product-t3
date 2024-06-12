@@ -141,14 +141,6 @@ export default function Home() {
   );
   const [checklistTypeIndex, setChecklistTypeIndex] = useState<number>(0);
 
-  const handleContractTypeChange = (index: number) => {
-    setSelectedContractTypeName(contractTypeList[index]?.name ?? "");
-    setChecklistTypeIndex(index);
-    setSelectedTemplateType(templateType[index]);
-    setSelectedChecklistTypeName(ChecklistType[checklistTypeIndex]?.name ?? "");
-    const selectedTemplates = templateType[index] ?? [];
-  };
-
   const ChecklistType = [
     { name: "Supply Agreements" },
     { name: "Purchase Orders (POs)" },
@@ -236,10 +228,21 @@ export default function Home() {
     setSelectedGeograhyName(index);
   };
 
+  const handleContractTypeChange = (index: number) => {
+    setSelectedContractTypeName(contractTypeList[index]?.name ?? "");
+    setChecklistTypeIndex(index);
+    setSelectedTemplateType(templateType[index]);
+    setSelectedChecklistTypeName(ChecklistType[checklistTypeIndex]?.name ?? "");
+    const selectedTemplates = ChecklistTemplate[index] ?? [];
+    console.log(selectedTemplates);
+    setSelectedChecklistType(selectedTemplates);
+  };
+
   const handleChecklistTypeChange = (index: number) => {
     setSelectedChecklistTypeName(ChecklistType[index]?.name ?? "");
     const selectedTemplates = ChecklistTemplate[index] ?? [];
     setSelectedChecklistType(selectedTemplates);
+
     // if (selectedTemplates.length > 0) {
     //   setSelectedChecklistTemplateTypeName(selectedTemplates[0]?.name ?? "");
     // } else {
