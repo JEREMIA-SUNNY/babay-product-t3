@@ -144,6 +144,7 @@ export default function Home() {
   const handleContractTypeChange = (index: number) => {
     setSelectedContractTypeName(contractTypeList[index]?.name ?? "");
     setChecklistTypeIndex(index);
+    setSelectedTemplateType(templateType[index]);
     setSelectedChecklistTypeName(ChecklistType[checklistTypeIndex]?.name ?? "");
     const selectedTemplates = templateType[index] ?? [];
   };
@@ -172,7 +173,7 @@ export default function Home() {
     ],
     [{ name: "Contractual Compliance" }, { name: "Financial Compliance" }],
     [
-      { name: "Environmental Compliance:" },
+      { name: "Environmental Compliance" },
       { name: "Labor Standards Compliance" },
       { name: "Health and Safety Compliance" },
     ],
@@ -182,8 +183,9 @@ export default function Home() {
       { name: "Transport Safety Compliance" },
       { name: "Carrier Liability Compliance" },
     ],
-    [{ name: "Data Privacy Compliance" }, { name: "Service Level Compliance" }],
+
     [{ name: "Patent Compliance" }, { name: "Confidentiality Compliance" }],
+    [{ name: "Data Privacy Compliance" }, { name: "Service Level Compliance" }],
     [{ name: "Regulatory Compliance" }, { name: "Product Safety Compliance" }],
     [
       { name: "Anti-Corruption Compliance" },
@@ -235,7 +237,6 @@ export default function Home() {
   };
 
   const handleChecklistTypeChange = (index: number) => {
-    
     setSelectedChecklistTypeName(ChecklistType[index]?.name ?? "");
     const selectedTemplates = ChecklistTemplate[index] ?? [];
     setSelectedChecklistType(selectedTemplates);
@@ -284,19 +285,8 @@ export default function Home() {
     setAnalyzeTextGpt(null);
     percentage = 0;
   };
-  useEffect(() => {
-    const concatenatedQuestions = generateQuestionsArray(
-      "Quality Standards Compliance",
-    );
-   
-  }, []);
 
   const handleSubmit = async (files: FileArray) => {
-    const concatenatedQuestions = generateQuestionsArray(
-      "Quality Standards Compliance",
-    );
-
-
     if (files.length === 0) {
       alert("No files selected");
       return;
@@ -329,7 +319,14 @@ export default function Home() {
 
     router.push("/login");
   };
-
+  // useEffect(() => {
+  //   alert(selectedChecklistTemplateTypeName);
+  //   console.log(
+  //     generateQuestionsArray(
+  //       selectedChecklistTemplateTypeName ?? "Data Privacy Compliance",
+  //     ),
+  //   );
+  // }, [!selectedChecklistTemplateTypeName]);
   const handleExtraction = (fileKey: string) => {
     if (fileKey) {
       const authTokenReq = process.env.NEXT_PUBLIC_AUTH_TOKEN_REQ;
@@ -340,10 +337,10 @@ export default function Home() {
         fileKey,
         token: authTokenReq,
       });
+
       const text = generateQuestionsArray(
         selectedChecklistTemplateTypeName ?? "",
       );
-    
     }
   };
 
@@ -355,7 +352,7 @@ export default function Home() {
       }
       analyzeText({
         ocrOutput: extractedTexts ?? "",
-        contractType: "Quality Standards Compliance",
+        contractType: selectedChecklistTemplateTypeName ?? "",
         token: authTokenReq,
       });
     }
