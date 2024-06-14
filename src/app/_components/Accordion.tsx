@@ -32,7 +32,11 @@ const Accordion: React.FC<AccordionProps> = ({ question, reason, status }) => {
             </div>
           </div>
           <div className="flex items-center justify-center">
-            {isOpen ? <MdKeyboardArrowUp /> : <IoIosArrowDown />}
+            {isOpen ? (
+              <MdKeyboardArrowUp size={24} />
+            ) : (
+              <IoIosArrowDown size={18} />
+            )}
           </div>
         </div>
       </motion.div>
