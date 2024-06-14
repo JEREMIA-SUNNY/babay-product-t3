@@ -8,6 +8,7 @@ const openai = new OpenAI({
 export interface ChecklistItem {
   question: string;
   status: boolean;
+  reason: string;
 }
 
 export interface DocumentSummaryResponse {
@@ -47,13 +48,13 @@ ${ocrOutput}
 Analyze the content of the uploaded document based on the checklist questions and provide a concise summary in a natural paragraph format not exceeding 750 characters and minimum 500 characters. Avoid using markdown formatting and refer to the document as "the document."
 
 Additionally, based on the identified issues, suggest changes to the document so that it complies with the provided checklist in another paragraph not exceeding 750 characters and minimum 500 characters. Avoid using markdown formatting and refer to the document as "the document."
-After that, answer the checklist questions with true or false based on the content of the document. Format the output as a JSON object with the following structure:
+After that, answer the checklist questions with true or false based on the content of the document. if it is true, give the extract from the document which you used to make the conclusion, not exceeding 200 characters. the Format the output as a JSON object with the following structure:
 {
   "summary": "summary of the document",
   "checklist": [
-    { "question": "first question", "status": true/false },
-    { "question": "second question", "status": true/false },
-    // Continue for all checklist questions
+    { "question": "first question", "status": true/false, "reason": "" },
+    { "question": "second question", "status": true/false, "reason": "" },
+    // Continue for all checklist questions, The "reason" why should mention for all the checklist even it is true or false , if it is true, give the extract from the document which you used to make the conclusion, not exceeding 200 characters minimum 50 characters Mandatory to note out the point is true,
   ]
 }
 

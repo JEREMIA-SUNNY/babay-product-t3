@@ -1,11 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai";
 import { DocumentSummaryResponse } from "~/utils/openAiUtils";
+import Accordion from "./Accordion";
+import { MdKeyboardArrowUp } from "react-icons/md";
 
 const SummaryAndChecklist: React.FC<DocumentSummaryResponse> = ({
   summary,
   checklist,
 }) => {
+  const data = [1, 2, 3, 4, 5, 6];
+
   return (
     <div className="overflow-y-auto p-2  text-xs">
       <div className="mb-6 px-4 py-2">
@@ -14,20 +18,18 @@ const SummaryAndChecklist: React.FC<DocumentSummaryResponse> = ({
       </div>
       <div>
         <h3 className="mb-2 px-4 text-sm font-semibold">Checklist</h3>
-        <div className="space-y-4 px-4">
+        <div className="space-y-4  px-4">
           {checklist.map((item, index) => (
-            <div
-              key={index}
-              className="grid grid-cols-12 items-center rounded-lg bg-[#f5f5f5] px-4 py-2 "
-            >
-              <p className="col-span-10 text-xs text-black">{item.question}</p>
-              <div className="col-span-2 flex justify-end">
-                {item.status ? (
-                  <AiOutlineCheckCircle size={24} className="text-green-500" />
-                ) : (
-                  <AiOutlineCloseCircle size={24} className="text-red-500" />
-                )}
-              </div>
+            <div>
+              <div key={index} className=" ">
+                <div className="col-span-10">
+                  <Accordion
+                    question={item.question}
+                    status={item.status}
+                    reason={item.reason}
+                  />
+                </div>
+              </div>{" "}
             </div>
           ))}
         </div>
