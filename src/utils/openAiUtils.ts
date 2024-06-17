@@ -41,24 +41,57 @@ export async function getDocumentSummary(
 
 ${ocrOutput}
 
-**Checklist Questions:**
+*Checklist Questions:
 
-  * ${questions}
 
-Analyze the content of the uploaded document based on the checklist questions and provide a concise summary in a natural paragraph format not exceeding 750 characters and minimum 500 characters. Avoid using markdown formatting and refer to the document as "the document."
+ * ${questions}
 
-Additionally, based on the identified issues, suggest changes to the document so that it complies with the provided checklist in another paragraph not exceeding 750 characters and minimum 500 characters. Avoid using markdown formatting and refer to the document as "the document."
-After that, answer the checklist questions with true or false based on the content of the document. if it is true, give the extract from the document which you used to make the conclusion, not exceeding 200 characters. the Format the output as a JSON object with the following structure:
+*Task:*
+1. *Summary:* 
+   - Analyze the content of the document based on the checklist questions.
+   - Provide a concise summary of the document, not exceeding 750 characters.
+
+2. *Suggestions for Compliance:*
+   - Suggest changes to the document so that it complies with the provided checklist.
+   - Provide suggestions in a concise paragraph not exceeding 750 characters.
+
+3. *Checklist Review:*
+   - For each checklist question, determine if the document meets the requirement (true or false).
+   - If true, provide an extract from the document used to make this decision (not exceeding 200 characters).
+   - If false, provide a reason why it does not meet the requirement (not exceeding 200 characters).
+
+*Output Format:*
+
+json
 {
   "summary": "summary of the document",
+  "suggestions": "suggestions for compliance",
   "checklist": [
-    { "question": "first question", "status": true/false, "reason": "" },
-    { "question": "second question", "status": true/false, "reason": "" },
-    // Continue for all checklist questions, The "reason" why should mention for all the checklist even it is true or false , if it is true, give the extract from the document which you used to make the conclusion, not exceeding 200 characters minimum 50 characters Mandatory to note out the point is true,
+    { "question": "first question", "status": true/false, "reason": "reason or document extract" },
+    { "question": "second question", "status": true/false, "reason": "reason or document extract" },
+    // Continue for all checklist questions
   ]
 }
 
-Ensure that the status for each checklist question accurately reflects whether the document satisfies that specific question (true if satisfied, false if not).
+
+*Example Output:*
+
+json
+{
+  "summary": "The document outlines the terms and conditions of a service agreement between two parties, covering payment terms, confidentiality, and dispute resolution.",
+  "suggestions": "Ensure that the confidentiality clause explicitly states the duration of confidentiality obligations. Add a clause for data protection compliance.",
+  "checklist": [
+    { "question": "Does the document specify payment terms?", "status": true, "reason": "The payment terms are outlined in Section 3, stating the due date and method of payment. payment method cash and the date 10-8-2024" },
+    { "question": "Does the document include a confidentiality clause?", "status": false, "reason": "The document lacks a specific clause detailing confidentiality obligations." }
+  ]
+}
+
+
+*Instructions:*
+- Provide the summary and suggestions in natural paragraph format.
+- Ensure the checklist responses are accurate and concise.
+
+Ensure that the status for each checklist question accurately reflects ,
   `;
 
   const completion = await openai.chat.completions.create({
