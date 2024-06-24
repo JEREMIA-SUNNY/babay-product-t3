@@ -10,13 +10,13 @@ interface AccordionProps {
   reason: string;
 }
 const Accordion: React.FC<AccordionProps> = ({ question, reason, status }) => {
-  console.log();
+
 
   const [isOpen, setIsOpen] = useState(false);
   return (
     <div>
       <motion.div
-        className="flex-w flex  w-full items-center justify-between gap-4 rounded-lg border bg-[#f5f5f5] px-2 py-2"
+        className="flex-w flex  w-full items-center justify-between gap-4 rounded-lg border bg-[#f5f5f5] px-2 py-2 hover:cursor-pointer"
         onClick={() => setIsOpen((prev) => !prev)}
       >
         <div className="w-[90%]">{question}</div>{" "}

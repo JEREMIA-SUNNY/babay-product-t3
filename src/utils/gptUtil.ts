@@ -76,9 +76,8 @@ const checklistQuestions: Record<string, string[]> = {
 };
 
 export const generateQuestionsArray = (checklistName: string): string[] => {
-  console.log(checklistName);
   const questions = checklistQuestions[checklistName];
-  console.log(questions);
+
   if (questions) {
     return questions;
   } else {

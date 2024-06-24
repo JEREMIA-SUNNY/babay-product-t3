@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
-
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import {
@@ -10,7 +9,6 @@ import {
 import "react-circular-progressbar/dist/styles.css";
 import { api } from "~/trpc/react";
 import { convertFileToBase64 } from "~/utils/fileUtils";
-
 import { IoMdLogOut } from "react-icons/io";
 import { MdDocumentScanner } from "react-icons/md";
 import { RiRobot2Fill } from "react-icons/ri";
@@ -18,12 +16,22 @@ import { generateQuestionsArray } from "~/utils/gptUtil";
 import { ChecklistItem } from "~/utils/openAiUtils";
 import SummaryAndChecklist from "./_components/SummaryAndCheckList";
 import ThreeDotsWaveMain from "./ThreeDotWaveMain";
+import { IoWarningOutline } from "react-icons/io5";
+import { map } from "zod";
+import ComplianceScore from "./_components/ComplianceScore";
 type FileArray = File[];
+
+interface ChecklistItems {
+  question: string;
+  reason: string;
+  status: boolean;
+}
 
 export default function Home() {
   const [fileKey, setFileKey] = useState<string | null>(null);
   const [extractedTexts, setExtractedTexts] = useState<string | null>(null);
   const [checkListResult, setCheckListResult] = useState<ChecklistItem[]>([]);
+  const [percentage, setPercentage] = useState<number>(0);
 
   const { mutate: uploadDocument, isPending: isDocumentUploading } =
     api.document.uploadDocument.useMutation({
@@ -213,6 +221,14 @@ export default function Home() {
     setSelectedChecklistTemplateTypeName,
   ] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (checkListResult.length > 0) {
+      const trueCount = checkListResult.filter((item) => item.status).length;
+      const calculatedPercentage = (trueCount / checkListResult.length) * 100;
+      setPercentage(calculatedPercentage);
+    }
+  }, [checkListResult]);
+
   const handleTemplateTypChange = (index: string) => {
     setSelectedContractTemplateName(index);
   };
@@ -234,7 +250,6 @@ export default function Home() {
     setSelectedTemplateType(templateType[index]);
     setSelectedChecklistTypeName(ChecklistType[checklistTypeIndex]?.name ?? "");
     const selectedTemplates = ChecklistTemplate[index] ?? [];
-    console.log(selectedTemplates);
     setSelectedChecklistType(selectedTemplates);
   };
 
@@ -276,19 +291,25 @@ export default function Home() {
     overlayRef.current?.classList.remove("draggedover");
   };
 
-  let percentage = 85;
   const handleDelete = (file: File) => {
     setFiles((prevFiles) => prevFiles.filter((f) => f !== file));
     setFileKey(null);
+    setSizeAlert(null);
     setExtractedTexts(null);
     if (hiddenInputRef.current) {
       hiddenInputRef.current.value = "";
     }
     setExtractedTexts(null);
     setAnalyzeTextGpt(null);
-    percentage = 0;
+    setPercentage(0);
   };
 
+  //the submit file function include size limit alert uploade api call etc
+  //api          calllll
+
+  //handlesubmit
+
+  const [sizeAlert, setSizeAlert] = useState<string | null>(null);
   const handleSubmit = async (files: FileArray) => {
     if (files.length === 0) {
       alert("No files selected");
@@ -297,6 +318,11 @@ export default function Home() {
     const file = files[0];
     if (!file) {
       alert("No file selected");
+      return;
+    }
+    const maxSizeInBytes = 4 * 1024 * 1024;
+    if (file.size > maxSizeInBytes) {
+      setSizeAlert("Max allowed file size is 5 MB");
       return;
     }
     const authTokenReq = process.env.NEXT_PUBLIC_AUTH_TOKEN_REQ;
@@ -313,23 +339,16 @@ export default function Home() {
     setIsUploading(false);
   };
 
-  const handleCancel = () => {
-    setFiles([]);
-  };
+  //log outttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt
 
   const handleLogout = () => {
     localStorage.setItem("isLoggedIn", "false");
 
     router.push("/login");
   };
-  // useEffect(() => {
-  //   alert(selectedChecklistTemplateTypeName);
-  //   console.log(
-  //     generateQuestionsArray(
-  //       selectedChecklistTemplateTypeName ?? "Data Privacy Compliance",
-  //     ),
-  //   );
-  // }, [!selectedChecklistTemplateTypeName]);
+
+  // extracting text file gpt call all are here
+
   const handleExtraction = (fileKey: string) => {
     if (fileKey) {
       const authTokenReq = process.env.NEXT_PUBLIC_AUTH_TOKEN_REQ;
@@ -680,7 +699,7 @@ export default function Home() {
             </div>
           </div>
         </section>
-        <section className="flex w-full flex-col  gap-4 px-8   pt-4 md:max-h-[550px] md:flex-row">
+        <section className="flex w-full flex-col  gap-4 px-8   pt-4 md:max-h-[550px] md:flex-row xl:min-h-[290px]">
           {files.length !== 0 ? (
             <div className="h-full w-full flex-1 overflow-x-auto rounded-xl bg-white  p-1 text-center">
               {files.length !== 0 && (
@@ -717,6 +736,8 @@ export default function Home() {
               </div>
             </div>
           )}
+
+          {/* //upload and score scetrion */}
           <div className="flex   flex-col  gap-3 rounded-2xl md:w-[25%] ">
             <div className=" flex-1 items-center justify-center rounded-2xl bg-white md:h-[250px]  md:max-h-[250px]">
               {" "}
@@ -800,7 +821,7 @@ export default function Home() {
                             files.map((file) => (
                               <li
                                 key={file.name}
-                                className="block h-32  w-32 p-1"
+                                className="block h-28  w-28 p-1 pb-4"
                               >
                                 <article
                                   tabIndex={0}
@@ -843,6 +864,16 @@ export default function Home() {
                               </li>
                             ))
                           )}
+                          {sizeAlert ? (
+                            <div className="inline-block w-full  text-center text-xs font-medium text-red-600">
+                              <span className="flex justify-center gap-2 text-center">
+                                <span className="flex items-center">
+                                  <IoWarningOutline color="red" />
+                                </span>{" "}
+                                {sizeAlert}
+                              </span>
+                            </div>
+                          ) : null}
                         </ul>
                       </section>
                     </article>
@@ -850,30 +881,22 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div className="  rounded-2xl bg-white   md:h-[280px]   ">
-              <p className="mt-4 pb-4 text-center text-sm font-semibold text-black ">
+
+            <div className="  rounded-2xl bg-white   md:h-[280px]    ">
+              <p className="mt-4 pb-4 text-center text-sm font-semibold text-black 2xl:pb-2 ">
                 Compliance Score
               </p>
-              <div className="px-32 pt-8 md:px-28 2xl:px-32">
-                <CircularProgressbarWithChildren
-                  styles={buildStyles({
-                    textColor: "red",
-                    pathColor: "green",
-                    trailColor: "#ebecf0",
-                  })}
-                  value={analyzeTextGpt ? percentage : 0}
-                >
-                  {" "}
-                  <div style={{ fontSize: 18, marginTop: -5, color: "black" }}>
-                    <strong> {analyzeTextGpt ? percentage : 0} %</strong>
-                  </div>
-                </CircularProgressbarWithChildren>
+              <div className="px-32 pt-5 md:px-28 2xl:px-28">
+                <ComplianceScore
+                  analyzeTextGpt={analyzeTextGpt}
+                  percentage={percentage}
+                />
               </div>
             </div>
           </div>
 
           <div
-            className={`r flex h-[530px] flex-1 items-center justify-center rounded-xl bg-white   text-justify text-xs text-black ${
+            className={`r flex h-[530px]  flex-1 items-center justify-center rounded-xl bg-white   text-justify text-xs text-black ${
               extractedTexts
                 ? extractedTexts.length > 200
                   ? "overflow-hidden"
@@ -934,23 +957,20 @@ export default function Home() {
 
               {analyzeTextGpt ? (
                 <div className="flex h-[25%] w-full flex-col  items-center justify-center gap-2 border-t-2 px-6">
-                  <div className="pt-5">
-                    Would you like me to rewrite the contract with the
-                    recommended changes?
-                  </div>
+                  <div className="pt-5">What else can I help you with?</div>
                   <div className="flex gap-4 pb-5 pt-2">
                     <button
                       onClick={handleAnalyze}
                       id="button"
                       className={`focus:shadow-outline disabled:  h-fit  min-w-[100px] rounded-md border-2 border-black bg-black px-3 py-2 text-sm text-white transition-all duration-300 ease-linear hover:scale-105 focus:outline-none `}
                     >
-                      Yes
+                      Rewrite the contract
                     </button>
                     <button
                       id="button"
                       className={` focus:shadow-outline disabled:  h-fit  min-w-[100px] rounded-md border-2 border-black  px-3 py-2 text-sm text-black transition-all duration-300 ease-linear hover:scale-105 focus:outline-none `}
                     >
-                      No
+                      Generate endorsement
                     </button>
                   </div>
                 </div>
