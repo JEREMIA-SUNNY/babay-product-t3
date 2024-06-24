@@ -55,10 +55,12 @@ export default function Home() {
       },
     });
   const [analyzeTextGpt, setAnalyzeTextGpt] = useState<string | null>(null);
+  const [suggestions, setSuggestions] = useState<string | null>(null);
   const { mutate: analyzeText, isPending: isAnalyzing } =
     api.document.analyzeDocument.useMutation({
       onSuccess: (data) => {
         setAnalyzeTextGpt(data.summary);
+        setSuggestions(data.suggestions);
         setCheckListResult(data.checklist);
       },
       onError: (error) => {
@@ -930,6 +932,7 @@ export default function Home() {
                   <SummaryAndChecklist
                     summary={analyzeTextGpt}
                     checklist={checkListResult}
+                    suggestions={suggestions ?? ""}
                   />
                 ) : (
                   <div className="relative">
@@ -957,18 +960,18 @@ export default function Home() {
 
               {analyzeTextGpt ? (
                 <div className="flex h-[25%] w-full flex-col  items-center justify-center gap-2 border-t-2 px-6">
-                  <div className="pt-5">What else can I help you with?</div>
+                  <div className="pt-5 font-semibold">What else can I help you with?</div>
                   <div className="flex gap-4 pb-5 pt-2">
                     <button
-                      onClick={handleAnalyze}
+                      // onClick={handleAnalyze}
                       id="button"
-                      className={`focus:shadow-outline disabled:  h-fit  min-w-[100px] rounded-md border-2 border-black bg-black px-3 py-2 text-sm text-white transition-all duration-300 ease-linear hover:scale-105 focus:outline-none `}
+                      className={`focus:shadow-outline disabled:  h-fit  min-w-[100px] rounded-md border-2 border-black bg-black px-3 py-2 text-xs text-white transition-all duration-300 ease-linear hover:scale-105 focus:outline-none `}
                     >
                       Rewrite the contract
                     </button>
                     <button
                       id="button"
-                      className={` focus:shadow-outline disabled:  h-fit  min-w-[100px] rounded-md border-2 border-black  px-3 py-2 text-sm text-black transition-all duration-300 ease-linear hover:scale-105 focus:outline-none `}
+                      className={` focus:shadow-outline disabled:  h-fit  min-w-[100px] rounded-md border-2 border-black  px-3 py-2 text-xs text-black transition-all duration-300 ease-linear hover:scale-105 focus:outline-none `}
                     >
                       Generate endorsement
                     </button>
