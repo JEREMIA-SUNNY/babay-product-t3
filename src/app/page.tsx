@@ -227,7 +227,8 @@ export default function Home() {
     if (checkListResult.length > 0) {
       const trueCount = checkListResult.filter((item) => item.status).length;
       const calculatedPercentage = (trueCount / checkListResult.length) * 100;
-      setPercentage(calculatedPercentage);
+      const roundedPercentage = Math.round(calculatedPercentage);
+      setPercentage(roundedPercentage);
     }
   }, [checkListResult]);
 
@@ -960,7 +961,9 @@ export default function Home() {
 
               {analyzeTextGpt ? (
                 <div className="flex h-[25%] w-full flex-col  items-center justify-center gap-2 border-t-2 px-6">
-                  <div className="pt-5 font-semibold">What else can I help you with?</div>
+                  <div className="pt-5 font-semibold">
+                    What else can I help you with?
+                  </div>
                   <div className="flex gap-4 pb-5 pt-2">
                     <button
                       // onClick={handleAnalyze}
