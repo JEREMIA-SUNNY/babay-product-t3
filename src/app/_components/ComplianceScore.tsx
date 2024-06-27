@@ -14,19 +14,23 @@ interface props {
   percentage: number;
 }
 const ComplianceScore: React.FC<props> = ({ analyzeTextGpt, percentage }) => {
+  console.log(percentage);
   return (
     <CircularProgressbarWithChildren
       styles={buildStyles({
         textColor: "red",
-        pathColor: "green",
+        pathColor:
+          percentage < 50 ? "red" : percentage >= 80 ? "green" : "orange",
         trailColor: "#",
       })}
       value={analyzeTextGpt ? percentage : 0}
     >
       {" "}
-      <div style={{ fontSize: 18, marginTop: -5, color: "black" }}>
-        <strong> {analyzeTextGpt ? percentage : 0} %</strong>
-      </div>
+      {analyzeTextGpt ? (
+        <div style={{ fontSize: 18, marginTop: -5, color: "black" }}>
+          <strong> {analyzeTextGpt ? percentage : 0} %</strong>
+        </div>
+      ) : null}
     </CircularProgressbarWithChildren>
   );
 };
